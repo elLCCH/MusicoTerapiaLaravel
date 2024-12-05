@@ -1,0 +1,247 @@
+php artisan make:model Cliente --resource //CREAR MODELO Y CONTROLADOR
+ng g c name --skip-tests //crear componente
+ng generate module componentes/gestiones/name --routing //crear modulos
+ng g service servicios/gestiones/name --skip-tests
+ng g interceptor auth --skip-tests
+
+//=====================================NEW PROYECT?=======================
+--NUEVO ENVIRONMENT
+1 CREAR MANUALMENTE LOS ARCHIVOS ENVIRONMENT
+2 EN LOS ARCHIVOS:
+//DESARROLLO
+export const environment = {
+  production: false,
+  apiUrl: 'http://localhost:3000/api' // Ajusta esta URL a tu API de desarrollo
+};
+//PRODUCCION
+export const environment = {
+  production: true,
+  apiUrl: '' // Ajusta esta URL a tu API de producción
+};
+
+EN EL angular.json En el build y serve deberan verse asi
+"build": {
+  "configurations": {
+    "production": {
+      "fileReplacements": [
+        {
+          "replace": "src/environments/environment.ts",
+          "with": "src/environments/environment.prod.ts"
+        }
+      ],
+      ...
+    }
+  }
+},
+"serve": {
+  "configurations": {
+    "production": {
+      "browserTarget": "your-app-name:build:production"
+    }
+  }
+}
+
+--EVITAR PROBLEMA DE LA TABLA SESSIONS DEL mysql:
+SESSION_DRIVER=array //reemplazar y poner ese codigo de: SESSION_DRIVER=database hacia SESSION_DRIVER=array
+--INCORPORAR api.php //AL PARECER PARA LOS TOKENS IGUAL ES EN API.PHP
+php artisan install:api
+
+--=================================================EN CASO DE USAR TOKENS PERSONALIZADOS.=============================================================
+php artisan make:controller AuthController
+
+IMAGINA Q TENGO TABLA CLIENTES CREADO DIRECTAMENTE:
+CREATE OR REPLACE TABLE clientes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombres VARCHAR(100) NULL,
+    apellidos VARCHAR(100) NULL,
+    usuario VARCHAR(50) NULL,
+    contrasenia VARCHAR(500) NULL,
+    celular INT NULL,
+    edad INT NULL,
+    fechnac DATE NULL,
+    carnet VARCHAR(50) NULL,
+    foto VARCHAR(500) NULL,
+    created_at DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+----PASO 1:ENTONCES EL MODELO DE ESTE DEBERA ESTAR ASI:
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens;
+
+class Cliente extends Authenticatable //AHORA Authenticatable
+{
+    use HasApiTokens, HasFactory;
+
+    protected $table = 'clientes';
+
+    // Lista de atributos asignables
+    protected $fillable = [
+        'nombres', 'apellidos', 'usuario', 'contrasenia', 'celular', 'edad', 'fechnac', 'carnet', 'foto'
+    ];
+}
+
+----PASO 2: crear tabla
+CREATE TABLE `personal_access_tokens` (
+    `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `tokenable_type` VARCHAR(255) NOT NULL,
+    `tokenable_id` BIGINT(20) UNSIGNED NOT NULL,
+    `name` VARCHAR(255) NOT NULL,
+    `token` VARCHAR(64) NOT NULL,
+    `abilities` TEXT,
+    `last_used_at` TIMESTAMP NULL,
+    `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    INDEX `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`, `tokenable_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+ALTER TABLE `personal_access_tokens`
+ADD COLUMN `expires_at` TIMESTAMP NULL AFTER `abilities`;
+
+Ó ESTA MEJOR:
+CREATE TABLE `personal_access_tokens` (
+    `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `tokenable_type` VARCHAR(255) NOT NULL,
+    `tokenable_id` BIGINT(20) UNSIGNED NOT NULL,
+    `name` VARCHAR(255) NOT NULL,
+    `token` VARCHAR(64) NOT NULL,
+    `abilities` TEXT,
+    `last_used_at` TIMESTAMP NULL,
+    `expires_at` TIMESTAMP NULL,
+    `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    INDEX `personal_access_tokens_tokenable_type_tokenable_id_index` (`tokenable_type`, `tokenable_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+----PASO 3: INSTALAR LARAVEL SANCTUM O CONFIGURAR:
+composer require laravel/sanctum
+php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"
+
+----PASO 4: ahora asi se ve el authenticador AuthController
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\Cliente;
+
+class AuthController extends Controller
+{
+    public function login(Request $request)
+    {
+        // validar
+        $request->validate([
+            "usuario" => "required",
+            "contrasenia" => "required",
+        ]);
+
+        // verificar
+        $user = $request->input('usuario');
+        $pass = $request->input('contrasenia');
+
+        $admin = Cliente::where('usuario', '=', $user)->where('contrasenia', '=', $pass)->first();
+
+        if ($admin) {
+            // generar token
+            $tokenResult = $admin->createToken("login");
+            $token = $tokenResult->plainTextToken;
+
+            // responder
+            return response()->json([
+                "access_token" => $token,
+                "token_type" => "Bearer",
+                "usuario" => $admin
+            ]);
+        } else {
+            return response()->json([
+                "message" => "Nombre de usuario o contraseña incorrectos."
+            ], 401);
+        }
+    }
+}
+
+---PASO 5 en el config/sanctum.php: CONFIGURAR TIEMPO DE EXPIRACION DEL TOKENS
+'expiration'=>60  //de 60minutos
+
+---PASO 6 : EN EL FRONTEND HACER FUNCIONAR LAS PETICIONES CON INTERCEPTORES "este interceptor sirve para realizar acciones que nos permitimos desde el sactum del api
+    PASO 6.1: CREAR ARCHIVO auth.interceptor.ts
+    //LO DE AQUI ES COMO UNA CONFIGURACION BASICA EN ESE INTERCEPTOR: EN ESTE CASO SI NO EXISTE EL TOKEN EN BASE DE DATOS ENTONCES NOS REDIRECCIONA AL /inicio
+import { Injectable } from '@angular/core';
+import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpErrorResponse } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { Router } from '@angular/router';
+
+@Injectable()
+export class AuthInterceptor implements HttpInterceptor {
+
+  constructor(private router: Router) {}
+
+  intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
+    const token = localStorage.getItem("token");
+    console.log('Interceptor ejecutado, token:', token); // Verificar token
+
+    let tokenizedReq = request.clone({
+      setHeaders: {
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    console.log('Tokenized Request:', tokenizedReq); // Verificar request clonada
+
+    return next.handle(tokenizedReq).pipe(
+      tap(() => {},
+        (error: any) => {
+          console.log("ERROR **********", error);
+          if (error instanceof HttpErrorResponse && error.status === 401) {
+            localStorage.removeItem("token");
+            this.router.navigate(["/inicio"]);
+          }
+        }
+      )
+    );
+  }
+}
+
+    PASO 6.2: configuracion en app.config.ts: EN SI SOLO DEBEMOS ADICIONAR ESTOS CODIGOS:
+    import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptors } from '@angular/common/http';
+    import { AuthInterceptor } from './auth.interceptor'; // Ajusta la ruta si es necesario
+
+    adicionar en el providers:  provideHttpClient(),{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
+
+
+    LO DEMAS DE CODIGO ES DE OTRO PROYECTO
+
+import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { provideRouter } from '@angular/router';
+
+import { routes } from './app.routes';
+import { provideAnimations } from '@angular/platform-browser/animations'; //IMPORTACION DE animaciones
+// import { BrowserModule } from '@angular/platform-browser';
+// import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptors } from '@angular/common/http';
+import { AuthInterceptor } from './auth.interceptor'; // Ajusta la ruta si es necesario
+
+export const appConfig: ApplicationConfig = {
+  providers: [provideZoneChangeDetection({ eventCoalescing: true }), provideRouter(routes),
+    provideAnimations(),
+    provideHttpClient(),
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
+
+  ]
+};
+
+///DATO EXTRA: PARA SABER LA EXISTENCIA DE NUESTRO TOKEN EN BASE DE DATOS USAR ESTA CONSULTA:
+SELECT * FROM personal_access_tokens WHERE token = SHA2('STNkSQxM5La748KFY5S15C6DEjLiIJfeO3Jr35dPbfb6730d', 256);
+originalmente era asi: 5|STNkSQxM5La748KFY5S15C6DEjLiIJfeO3Jr35dPbfb6730d.... pero solo nos sirve el: STNkSQxM5La748KFY5S15C6DEjLiIJfeO3Jr35dPbfb6730d
+
+//TOMAR EN CUENTA: VI Q NO ES NECESARIO PONER ESTO EN EL App.component.ts PERO LO DEJARE IGUAL
+ADICIONAR
+import { AuthInterceptor } from './auth.interceptor';
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
+  ],
