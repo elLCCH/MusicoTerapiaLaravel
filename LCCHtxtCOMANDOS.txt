@@ -146,14 +146,15 @@ class AuthController extends Controller
 
         if ($admin) {
             // generar token
-            $tokenResult = $admin->createToken("login");
+            //$tokenResult = $admin->createToken("login");
+            $tokenResult = $admin->createToken('login', ['*'], now()->addMinutes(60));
             $token = $tokenResult->plainTextToken;
 
             // responder
             return response()->json([
-                "access_token" => $token,
-                "token_type" => "Bearer",
-                "usuario" => $admin
+                "access_token" => $token, //ES SI SE GUARDA POR EL FUTURO INTERCEPTOR EN ANGULAR
+                "token_type" => "Bearer", //PODEMOS GUARDAR ESTA VARIABLE EN UN localStorage
+                "usuario" => $admin //PODEMOS GUARDAR ESTA VARIABLE EN UN localStorage
             ]);
         } else {
             return response()->json([
@@ -164,7 +165,87 @@ class AuthController extends Controller
 }
 
 ---PASO 5 en el config/sanctum.php: CONFIGURAR TIEMPO DE EXPIRACION DEL TOKENS
-'expiration'=>60  //de 60minutos
+'expiration'=>60  //de 60minutos //AL PARECER CON TOKENS PERSONALIZADOS NO FUNCIONA
+
+--PASO 5.1: COSAS QUE SABER DE LOS TOKENS PERSONALIZADOS
+es interesante q cuando se use el token  el ultimo uso este siempre actualizandose. DATASO...
+
+es interesante que funcione el expires_at, cuando expira en BD entonces cuando se utiliza este token expirado no permite el acceso a la api ya q esta expirado
+ahora como en el PASO 6 crearé interceptores entonces como detecta q esta expirado entonces elimino del localStorage el TOKEN y nos retorna a inicio,
+COMO YA SABEMOS Q FUNCIONA ESTO ENTONCES HAY Q HACER Q TENGA FECHA DE EXPIRACION: SOLO FALTARIA HACER que tenga tiempo de expiracion los token en la BD
+en donde creamos el token poner:
+PASO 5.2: PONIENDO CODIGO PARA Q TENGA EXPIRACION EL TOKEN//REEMPLAZANDO ESTE CODIGO: $tokenResult = $admin->createToken("login"); //RECUERDA Q ESTE ES UN EJEMPLO DE 15MINUTOS
+$tokenResult = $admin->createToken('login', ['*'], now()->addDays(7));
+O SI QUEREMOS POR MINUTOS ENTONCES
+$tokenResult = $admin->createToken('login', ['*'], now()->addMinutes(15)); //15minutos
+
+SI FUNCIONA; PERO AHORA QUIERO Q EL CAMPO expires_at se actualice cuando el usuario deja inactivo su sesion durante 10 minutos, luego lo retoma porque aun esta dentro
+de los 15 minutos, entonces se actualiza a 15minutos el expires_at; pero si retoma su sesion pasado los 15 minutos de antes entonces se pierde su token entonces debera
+iniciar de nuevo la sesion, ENTONCES HACEMOS PASO 5.3
+
+PASO 5.3: PARA ACTUALIZACION DE TOKENS SEGUN SESION Y TIEMPO DE INACTIVIDAD
+PASO 5.3.1: CREAR EN LARAVEL UN middleware
+php artisan make:middleware UpdateTokenExpiration
+PASO 5.3.2: PEGAR ESTE CODIGO EN EL MIDDLEWARE CREADO (ESTA EN http/Middleware/UpdateTokenExpiration): //RECUERDA Q ESTE ES UN EJEMPLO DE 15MINUTOS
+<?php
+namespace App\Http\Middleware;
+use Closure;
+use Illuminate\Http\Request;
+use Laravel\Sanctum\PersonalAccessToken;
+use Carbon\Carbon;
+
+class UpdateTokenExpiration
+{
+    public function handle(Request $request, Closure $next)
+    {
+        if ($request->user()) {
+            $token = $request->bearerToken();
+            if ($token) {
+                $personalAccessToken = PersonalAccessToken::findToken($token);
+                if ($personalAccessToken) {
+                    $expiresAt = Carbon::parse($personalAccessToken->expires_at);
+                    $now = Carbon::now();
+
+                    if ($now->gt($expiresAt)) {
+                        return response()->json(['message' => 'Token expired.'], 401);
+                    }
+
+                    $personalAccessToken->expires_at = $now->addMinutes(15); //POR QUERER 15MINUTOS
+                    $personalAccessToken->save();
+                }
+            }
+        }
+
+        return $next($request);
+    }
+}
+
+PASO 5.3.3: Aplicar el Middleware a tus Rutas o Controladores:
+Puedes aplicar el middleware directamente en los controladores donde necesites esta lógica. Edita tus controladores para incluir el middleware.
+OSEA AUMENTAR ESTE CODIGO DONDE SE NECESITE AUMENTAR, EN SI PONER EN CUALQUIER CONTROLLER DONDE QUIERES Q SE EJECUTE AUTOMATICAMENTE LA ACUTALIZACION//OPTE POR LA PRIMERA
+
+use App\Http\Middleware\UpdateTokenExpiration;
+use Illuminate\Routing\Controller;
+public function __construct() {
+    $this->middleware(UpdateTokenExpiration::class);
+}
+
+O SINO MANUAL DIRECTAMENTE EN LAS RUTAS
+use App\Http\Middleware\UpdateTokenExpiration;
+
+Route::middleware([UpdateTokenExpiration::class])->group(function () {
+    Route::get('/ruta/protegida', [TuControlador::class, 'metodo']);
+    // Otras rutas protegidas
+});
+
+PASO 5.3.4: COSAS INTERESANTES(ESTO NO SE PONE, SOLO SON CURIOSIDADES)
+EN ROUTES/API ESTUVE HACIENDO PRUEBAS, CUANDO LAS RUTAS ESTAN PROTEGIDAS SE ACTUALIZA EL expires_at
+Route::middleware("auth:sanctum")->group(function(){
+    // Route::resource('Clientes', 'App\Http\Controllers\ClienteController');
+    Route::resource('Clientes', ClienteController::class);
+});
+PERO SI NO TIENE PROTECCION COMO ESTE ENTONCES NO SE ACTUALIZA NADA DE expires_at
+Route::resource('Clientes', ClienteController::class);
 
 ---PASO 6 : EN EL FRONTEND HACER FUNCIONAR LAS PETICIONES CON INTERCEPTORES "este interceptor sirve para realizar acciones que nos permitimos desde el sactum del api
     PASO 6.1: CREAR ARCHIVO auth.interceptor.ts
@@ -198,8 +279,12 @@ export class AuthInterceptor implements HttpInterceptor {
         (error: any) => {
           console.log("ERROR **********", error);
           if (error instanceof HttpErrorResponse && error.status === 401) {
+            console.log("TOKEN EXPIRADO");
             localStorage.removeItem("token");
             this.router.navigate(["/inicio"]);
+          }
+          if (error instanceof HttpErrorResponse && error.status === 403) {
+            console.log("PERMISOS INSUFICIENTES");
           }
         }
       )
@@ -214,8 +299,8 @@ export class AuthInterceptor implements HttpInterceptor {
     adicionar en el providers:  provideHttpClient(),{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
 
 
-    LO DEMAS DE CODIGO ES DE OTRO PROYECTO
-
+    LO DEMAS DE CODIGO ES DE ESTE PROYECTO
+//app.config.ts
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
@@ -235,13 +320,153 @@ export const appConfig: ApplicationConfig = {
   ]
 };
 
+
+
+
 ///DATO EXTRA: PARA SABER LA EXISTENCIA DE NUESTRO TOKEN EN BASE DE DATOS USAR ESTA CONSULTA:
 SELECT * FROM personal_access_tokens WHERE token = SHA2('STNkSQxM5La748KFY5S15C6DEjLiIJfeO3Jr35dPbfb6730d', 256);
 originalmente era asi: 5|STNkSQxM5La748KFY5S15C6DEjLiIJfeO3Jr35dPbfb6730d.... pero solo nos sirve el: STNkSQxM5La748KFY5S15C6DEjLiIJfeO3Jr35dPbfb6730d
 
-//TOMAR EN CUENTA: VI Q NO ES NECESARIO PONER ESTO EN EL App.component.ts PERO LO DEJARE IGUAL
+
+
+
+//TOMAR EN CUENTA: Vi Q NO ES NECESARIO PONER ESTO EN EL App.component.ts PERO LO DEJARE IGUAL PARA Q FUNCIONE LOS INTERCEPTORES
 ADICIONAR
 import { AuthInterceptor } from './auth.interceptor';
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
   ],
+
+
+
+=====================================================HASTA ACA TODO BIEN, PODEMOS TRABAJAR ASI======================================================
+MIRA MI ROUTES/API
+Route::middleware("auth:sanctum")->group(function(){
+    Route::resource('Clientes', ClienteController::class);
+});
+
+
+PEEEEERO QUIERO TRABAJAR CON ROLES: LOS ROLES AYUDA A DEFINIR QUE COSAS PUEDE HACER EL USUARIO QUE INICIO SESION
+PASO 1: DEFINIR ROLES:
+podrías tener roles como admin, editor, viewer, y permisos específicos para acciones como view-cliente create-cliente, update-cliente, delete-cliente, etc.
+
+PASEO 2: AL MOMENTO DE LOGEARSE Y QUE EL CODIGO PASE POR EL AuthController, AL MOMENTO DE CREAR TOKEN PODEMOS DEFINIR UNO DE ESTOS
+// Crear un token para un administrador con acceso completo
+$tokenResult = $admin->createToken('login', ['*'], now()->addMinutes(60));
+
+// Crear un token para un editor con permisos específicos
+$tokenResult = $admin->createToken('login', ['create-cliente', 'update-cliente'], now()->addMinutes(60));
+
+// Crear un token para un viewer con permisos de solo lectura
+$tokenResult = $admin->createToken('login', ['view-cliente'], now()->addMinutes(60));
+
+
+PASO 3: CREAR EL MIDDLEWARE PARA REVISAR LAS HABILIDADES EN LARAVEL
+php artisan make:middleware CheckAbilities
+
+DENTRO DE ESTE MIDDLEWARE PONER ESTE CODIGO:
+<?php
+namespace App\Http\Middleware;
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+use Laravel\Sanctum\PersonalAccessToken;
+
+class CheckAbilities
+{
+    public function handle(Request $request, Closure $next, ...$abilities)
+    {
+        // Log::info('Middleware CheckAbilities iniciado.');
+
+        // Obtener el token de la solicitud
+        $token = $request->bearerToken();
+        // Log::info('Token recibido: ' . $token);
+
+        if ($token) {
+            // Buscar el token en la base de datos
+            $personalAccessToken = PersonalAccessToken::findToken($token);
+            if ($personalAccessToken) {
+                // Log::info('Token encontrado en la base de datos.');
+
+                // Obtener el cliente asociado con el token
+                $cliente = $personalAccessToken->tokenable; // Asumiendo que 'tokenable' es la relación correcta
+                // Log::info('Cliente asociado con el token: ' . $cliente->id);
+
+                if ($cliente) {
+                    // Verificar las habilidades del token
+                    foreach ($abilities as $ability) {
+                        if (!$personalAccessToken->can($ability)) {
+                            // Log::warning('Falta de habilidad: ' . $ability);
+                            return response()->json(['message' => 'PERMISOS INSUFICIENTES.'], 403);
+                        }
+                    }
+
+                    // // Log::info('Middleware CheckAbilities finalizado.');
+                    return $next($request);
+                }
+            } else {
+                // Log::warning('Token no encontrado en la base de datos.');
+            }
+        } else {
+            // Log::warning('Token no recibido en la solicitud.');
+        }
+
+        // Log::warning('Acceso no autorizado.');
+        return response()->json(['message' => 'TOKEN EXPIRADO DESDE VERIFICACION DE HABILIDADES.'], 401);
+    }
+}
+
+
+
+
+
+
+PASO 4: ACTUALIZAR COMO SE VERIA NUESTRO ROUTE API // YA Q USAMOS auth:sanctum
+
+---PRIMERA FORMA:
+use App\Http\Controllers\ClienteController;
+use App\Http\Middleware\CheckAbilities;
+
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/Clientes', [ClienteController::class, 'index'])->middleware([CheckAbilities::class . ':view-cliente']);
+    Route::post('/Clientes', [ClienteController::class, 'store'])->middleware([CheckAbilities::class . ':create-cliente']);
+    Route::put('/Clientes/{id}', [ClienteController::class, 'update'])->middleware([CheckAbilities::class . ':update-cliente']);
+    Route::delete('/Clientes/{id}', [ClienteController::class, 'destroy'])->middleware([CheckAbilities::class . ':delete-cliente']);
+});
+
+---SEGUNDA FORMA:
+use App\Http\Controllers\ClienteController;
+use App\Http\Middleware\CheckAbilities;
+Route::middleware(['auth:sanctum'])->group(function () {
+    // Ruta para clientes con habilidades específicas
+    Route::middleware([CheckAbilities::class . ':view-cliente'])->group(function () {
+        Route::get('/Clientes', [ClienteController::class, 'index']);
+    });
+
+    Route::middleware([CheckAbilities::class . ':create-cliente'])->group(function () {
+        Route::post('/Clientes', [ClienteController::class, 'store']);
+    });
+
+    Route::middleware([CheckAbilities::class . ':update-cliente'])->group(function () {
+        Route::put('/Clientes/{id}', [ClienteController::class, 'update']);
+    });
+
+    Route::middleware([CheckAbilities::class . ':delete-cliente'])->group(function () {
+        Route::delete('/Clientes/{id}', [ClienteController::class, 'destroy']);
+    });
+});
+
+---COSAS Q SABER:
+LAS RUTAS SE EJECUTARAN SIEMPRE Y CUANDO CUMPLA CON LAS HABILIDADES, PERO EN CASO DE QUE PARA EJECUTAR LA RUTA SE
+NECESITE MAS DE UNA HABILIDAD, EJEMPLO: abilities=["view-cliente","cliente"]  //el "cliente" como LCCH lo puedo usar para saber el tipo de usuario
+
+ENTONCES EN [CheckAbilities::class . ':view-cliente']: AÑADIR UN "," y el nombre......
+OSEA:
+[CheckAbilities::class . ':view-cliente,cliente']
+
+
+--OTRA COSA Q SABER:
+SI EN MI BD TENGO ["view-cliente","cliente"]
+y en los ROUTES API ESTA CONFIGURADO ASI: [CheckAbilities::class . ':view-cliente'] //SI SE ACCEDERA A LA RUTA YA Q ES SUFICIENTE QUE TENGA EL view-cliente en el BD
+TENER CUIDADO CON ESO

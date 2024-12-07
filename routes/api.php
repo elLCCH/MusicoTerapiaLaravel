@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ClienteController;
-
+use App\Http\Middleware\CheckAbilities;
 
 
 
@@ -19,34 +19,51 @@ use App\Http\Controllers\AuthController;
 Route::prefix("v1/auth")->group(function(){ //el prefijo vi/auth funciona como el routing de angular: v1/auth/login
 
     Route::post('/login', [AuthController::class, "login"]); //EJECUTAR LA FUNCION login desde el authcontroller
-    Route::post('/registro', [AuthController::class, "registro"]);
+    // Route::post('/registro', [AuthController::class, "registro"]);
 
     Route::middleware("auth:sanctum")->group(function(){ //middleware se usa para verificar si tienes token, si no tienes no puedes entrar
         Route::post('/logout', [AuthController::class, "logout"]);
-        Route::get('/perfil', [AuthController::class, "perfil"]);
     });
 
 });
-Route::middleware("auth:sanctum")->group(function(){
-    // Route::resource('Clientes', 'App\Http\Controllers\ClienteController');
-    Route::resource('Clientes', ClienteController::class);
+// Route::middleware("auth:sanctum")->group(function(){
+//     Route::resource('Clientes', ClienteController::class);
+// });
+
+Route::middleware(['auth:sanctum'])->group(function () {
+    // Ruta para clientes con habilidades específicas
+    Route::middleware([CheckAbilities::class . ':view-cliente'])->group(function () {
+        Route::get('/Clientes', [ClienteController::class, 'index']);
+    });
+
+    Route::middleware([CheckAbilities::class . ':create-cliente'])->group(function () {
+        Route::post('/Clientes', [ClienteController::class, 'store']);
+    });
+
+    Route::middleware([CheckAbilities::class . ':update-cliente'])->group(function () {
+        Route::put('/Clientes/{id}', [ClienteController::class, 'update']);
+    });
+
+    Route::middleware([CheckAbilities::class . ':delete-cliente'])->group(function () {
+        Route::delete('/Clientes/{id}', [ClienteController::class, 'destroy']);
+    });
 });
 
 
-// Route::middleware("auth:sanctum")->group(function(){
 
-//     Route::post('/producto/{id}/actualizar-imagen', [ProductoController::class, "actualizarImagen"]);
-
-//     Route::apiResource("categoria", CategoriaController::class);
-//     Route::apiResource("producto", ProductoController::class);
-//     Route::apiResource("cliente", ClienteController::class);
-//     Route::apiResource("pedido", PedidoController::class);
+// Route::middleware(['auth:sanctum'])->group(function () {
+//     Route::get('/Clientes', [ClienteController::class, 'index'])->middleware([CheckAbilities::class . ':view-cliente']);
+//     Route::post('/Clientes', [ClienteController::class, 'store'])->middleware([CheckAbilities::class . ':create-cliente']);
+//     Route::put('/Clientes/{id}', [ClienteController::class, 'update'])->middleware([CheckAbilities::class . ':update-cliente']);
+//     Route::delete('/Clientes/{id}', [ClienteController::class, 'destroy'])->middleware([CheckAbilities::class . ':delete-cliente']);
 // });
 
-// Route::get("/pdf", [PedidoController::class, "reportePedidos"]);
 
-// Route::post("recuperar-password", [NuevoPasswordController::class, "recuperarPassword"]);
-// Route::post("reset-password", [NuevoPasswordController::class, "reset"]);
+
+
+
+
+
 
 
 Route::get("/no-authorizado", function(){

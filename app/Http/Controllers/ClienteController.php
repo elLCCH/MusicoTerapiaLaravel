@@ -4,9 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\Cliente;
 use Illuminate\Http\Request;
+use App\Http\Middleware\UpdateTokenExpiration;
+use Illuminate\Routing\Controller;
 
 class ClienteController extends Controller
 {
+
+    public function __construct() {
+        $this->middleware(UpdateTokenExpiration::class);
+    }
    //#region Inicio Controller de Crud PHP de Cliente
     public function index()
     {

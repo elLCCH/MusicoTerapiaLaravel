@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Cliente;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
+// use Illuminate\Support\Facades\Auth;
+// use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
@@ -43,6 +43,7 @@ class AuthController extends Controller
     //     }
 
     // }
+
     public function login(Request $request)
     {
         // validar
@@ -59,7 +60,9 @@ class AuthController extends Controller
 
         if ($admin) {
             // generar token
-            $tokenResult = $admin->createToken("login");
+            // $tokenResult = $admin->createToken("login");
+            // $tokenResult = $admin->createToken('login', ['*'], now()->addMinutes(60));
+            $tokenResult = $admin->createToken('login', ['view-cliente'], now()->addMinutes(60));
             $token = $tokenResult->plainTextToken;
 
             // responder
@@ -106,8 +109,4 @@ class AuthController extends Controller
 
     }
 
-    public function perfil(Request $request)
-    {
-        return response()->json($request->user());
-    }
 }
