@@ -11,13 +11,19 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 // class Cliente extends Model
 class Cliente extends Authenticatable
 {
-    // // Especificar el nombre de la tabla
-    // protected $table = 'clientes';
-    // // use HasFactory;
     use HasApiTokens, HasFactory;
     protected $table = 'clientes';
     // Lista de atributos asignables
     protected $fillable = [
         'nombres', 'apellidos', 'usuario', 'contrasenia', 'celular', 'edad', 'fechnac', 'carnet', 'foto'
     ];
+    public function createPersonalizedToken($tokenName, $abilities = ['*'], $expiration, $additionalInfo = [])
+    {
+        $token = $this->createToken($tokenName, $abilities,$expiration);
+
+        // Agregar información adicional al token
+        $token->accessToken->forceFill($additionalInfo)->save();
+
+        return $token;
+    }
 }

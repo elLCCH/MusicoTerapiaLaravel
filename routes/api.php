@@ -17,14 +17,11 @@ use App\Http\Controllers\AuthController;
 // });
 
 Route::prefix("v1/auth")->group(function(){ //el prefijo vi/auth funciona como el routing de angular: v1/auth/login
-
     Route::post('/login', [AuthController::class, "login"]); //EJECUTAR LA FUNCION login desde el authcontroller
-    // Route::post('/registro', [AuthController::class, "registro"]);
-
-    Route::middleware("auth:sanctum")->group(function(){ //middleware se usa para verificar si tienes token, si no tienes no puedes entrar
-        Route::post('/logout', [AuthController::class, "logout"]);
-    });
-
+    Route::post('/logout', [AuthController::class, 'logout']); //v1/auth/logout
+    // Route::middleware(['auth:sanctum'])->group(function(){ //middleware se usa para verificar si tienes token, si no tienes no puedes entrar
+    //     Route::post('/logout', [AuthController::class, 'logout']); //v1/auth/logout
+    // });
 });
 // Route::middleware("auth:sanctum")->group(function(){
 //     Route::resource('Clientes', ClienteController::class);
@@ -34,6 +31,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Ruta para clientes con habilidades específicas
     Route::middleware([CheckAbilities::class . ':view-cliente'])->group(function () {
         Route::get('/Clientes', [ClienteController::class, 'index']);
+    });
+
+    Route::middleware([CheckAbilities::class . ':view-cliente'])->group(function () {
+        Route::get('/Clientes/{id}', [ClienteController::class, 'show']);
     });
 
     Route::middleware([CheckAbilities::class . ':create-cliente'])->group(function () {
@@ -48,6 +49,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::delete('/Clientes/{id}', [ClienteController::class, 'destroy']);
     });
 });
+
+//PARA VERIFICAR TOKENS //SIRVE PARA LOS GUARD O SABER name DEL TOKEN DB// TAMBIEN SI YA ESTA EXPIRADO
+use App\Http\Controllers\TokenController;
+Route::post('/verify-token', [TokenController::class, 'verify']);
 
 
 

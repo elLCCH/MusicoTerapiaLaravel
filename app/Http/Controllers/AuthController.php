@@ -4,45 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Cliente;
 use Illuminate\Http\Request;
-// use Illuminate\Support\Facades\Auth;
-// use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
-
-    // public function funLogin(Request $request){
-
-
-    //     $validado = Validator::make($request->all(), [
-    //         'usuario' => ['required'],
-    //         'contrasenia' => ['required'],
-    //     ]);
-
-    //     if($validado->fails()){
-    //         return response()->json(["errors" => $validado->errors()], 422);
-    //     }
-
-
-    //     // if(!Auth::attempt(["email" => $request->email, "password" => $request->password])){
-    //     //     return response()->json(["mensaje" => "Credenciales Incorrectas"], 401);
-    //     // }
-    //     $user = $request->input('usuario');
-    //     $pass = $request->input('contrasenia');
-    //     $admin = Cliente::where('usuario', '=', $user)->where('contrasenia', '=', $pass)->first();
-
-    //     if ($admin) {
-    //         // generar token
-    //         $token = $request->user()->createToken("Token Login")->plainTextToken;
-
-    //         return response()->json([
-    //             "access_token" => $token,
-    //             "usuario" => $request->user()
-    //         ], 201);
-    //     }else{
-    //         return response()->json(["mensaje"=>"no se encontro nada"],201);
-    //     }
-
-    // }
 
     public function login(Request $request)
     {
@@ -60,9 +25,10 @@ class AuthController extends Controller
 
         if ($admin) {
             // generar token
-            // $tokenResult = $admin->createToken("login");
-            // $tokenResult = $admin->createToken('login', ['*'], now()->addMinutes(60));
-            $tokenResult = $admin->createToken('login', ['view-cliente'], now()->addMinutes(60));
+            // $tokenResult = $admin->createToken("Docente");
+            // $tokenResult = $admin->createToken('Docente', ['*'], now()->addMinutes(60));
+            $NomC = $admin->apellidos.' '.$admin->nombres;
+            $tokenResult = $admin->createPersonalizedToken('Admin', ['view-cliente'], now()->addMinutes(60), ['nombrecompleto' => $NomC]);
             $token = $tokenResult->plainTextToken;
 
             // responder
@@ -78,35 +44,25 @@ class AuthController extends Controller
         }
     }
 
-    // public function registro(Request $request)
-    // {
-    //     // validar
-    //     $request->validate([
-    //         "name" => "required",
-    //         "email" => "required|email|unique:users",
-    //         "password" => "required",
-    //         "c_password" => "required|same:password"
-    //     ]);
-    //     // registro
-    //     $usuario = new User();
-    //     $usuario->name = $request->name;
-    //     $usuario->email = $request->email;
-    //     $usuario->password = bcrypt($request->password);
-    //     $usuario->save();
-
-    //     // responder
-
-    //     return response()->json(["mensaje" => "Usuario Registrado"], 201);
-    // }
 
     public function logout(Request $request)
     {
-        $request->user()->tokens()->delete();
+        $token = $request->input('token');
+        $tokenParts = explode('|', $token);
+        $tokenId = $tokenParts[0] ?? null;
 
-        return response()->json([
-            "mensaje" => "Logout"
-        ]);
+        if ($tokenId) {
+            // Usar DB::delete con vinculaciones de parámetros
+            $deleted = DB::delete('DELETE FROM personal_access_tokens WHERE id = ?', [$tokenId]);
 
+            if ($deleted) {
+                return response()->json(['message' => 'Token DB ELIMINADO'], 200);
+            } else {
+                return response()->json(['message' => 'Token no encontrado o no eliminado'], 404);
+            }
+        }
+
+        return response()->json(['message' => 'TOKEN DB NO ENCONTRADO'], 404);
     }
 
 }

@@ -101,6 +101,7 @@ CREATE TABLE `personal_access_tokens` (
 ALTER TABLE `personal_access_tokens`
 ADD COLUMN `expires_at` TIMESTAMP NULL AFTER `abilities`;
 
+
 Ó ESTA MEJOR:
 CREATE TABLE `personal_access_tokens` (
     `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -109,8 +110,8 @@ CREATE TABLE `personal_access_tokens` (
     `name` VARCHAR(255) NOT NULL,
     `token` VARCHAR(64) NOT NULL,
     `abilities` TEXT,
-    `last_used_at` TIMESTAMP NULL,
     `expires_at` TIMESTAMP NULL,
+    `last_used_at` TIMESTAMP NULL,
     `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
@@ -444,6 +445,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/Clientes', [ClienteController::class, 'index']);
     });
 
+    Route::middleware([CheckAbilities::class . ':view-cliente'])->group(function () {
+        Route::get('/Clientes/{id}', [ClienteController::class, 'show']);
+    });
+
     Route::middleware([CheckAbilities::class . ':create-cliente'])->group(function () {
         Route::post('/Clientes', [ClienteController::class, 'store']);
     });
@@ -470,3 +475,190 @@ OSEA:
 SI EN MI BD TENGO ["view-cliente","cliente"]
 y en los ROUTES API ESTA CONFIGURADO ASI: [CheckAbilities::class . ':view-cliente'] //SI SE ACCEDERA A LA RUTA YA Q ES SUFICIENTE QUE TENGA EL view-cliente en el BD
 TENER CUIDADO CON ESO
+
+======CREAR EL LOGOUT PARA QUITAR EL LOGIN DE TOKEN DB Y el token del localStorage===
+PASO 1: AUMENTAR EL CODIGO DONDE CORRESPONDE...
+use App\Http\Controllers\AuthController;
+Route::post('/logout', [AuthController::class, 'logout']);
+
+ASI TERMINARIA SIENDO EN ESTE CASO EL ROUTE API:
+Route::prefix("v1/auth")->group(function(){ //el prefijo vi/auth funciona como el routing de angular: v1/auth/login
+    Route::post('/login', [AuthController::class, "login"]); //EJECUTAR LA FUNCION login desde el authcontroller
+    Route::post('/logout', [AuthController::class, 'logout']);
+    //Route::middleware("auth:sanctum")->group(function(){ //middleware se usa para verificar si tienes token, si no tienes no puedes entrar
+    //    Route::post('/logout', [AuthController::class, 'logout']); //v1/auth/logout
+    //});
+});
+
+PASO 2: ELIMINAR TOKEN CONFIGURANDO EL logout del authcontroller
+use Illuminate\Support\Facades\DB;
+public function logout(Request $request)
+{
+    $token = $request->input('token');
+    $tokenParts = explode('|', $token);
+    $tokenId = $tokenParts[0] ?? null;
+
+    if ($tokenId) {
+        // Usar DB::delete con vinculaciones de parámetros
+        $deleted = DB::delete('DELETE FROM personal_access_tokens WHERE id = ?', [$tokenId]);
+
+        if ($deleted) {
+            return response()->json(['message' => 'Token DB ELIMINADO'], 200);
+        } else {
+            return response()->json(['message' => 'Token no encontrado o no eliminado'], 404);
+        }
+    }
+
+    return response()->json(['message' => 'TOKEN DB NO ENCONTRADO'], 404);
+}
+
+PASO 3: EN EL SERVICIO auth.service ADICIONAR EL logout, BUENO YA CONOCEMOS EL loginConLaravel
+constructor(private http: HttpClient,private router: Router) { }
+
+  loginConLaravel(datos:any){
+    return this.http.post(`${this.ruta}api/v1/auth/login`, datos)
+  }
+
+  logout() {
+    const token = localStorage.getItem('token');
+    if (token) {
+      this.http.post(this.ruta+'api/logout', { token }).subscribe(
+        response => {
+          localStorage.removeItem('token');
+          this.router.navigate(['/auth/login']);
+        },
+        error => {
+          console.error('Error al cerrar sesión:', error);
+
+        }
+      );
+    } else {
+      this.router.navigate(['/auth/login']);
+    }
+  }
+  PASO 4: TERMINAR DE HACER FUNCIONAR EL BOTON PARA CERRAR SESION EN EL ANGULAR TODO TERMINAR, TODO LO NECESARIO
+
+======================HASTA ACA TODO CHIDO HICIMOS FUNCIONAR POR ROLES LOS TOKENS ETC====================================
+
+
+PERO SOY AMBICIOSO Y QUIERO ADICIONAR EL NOMBRE COMPLETO DEL USUARIO QUE INICIO SESION EN EL TOKEN BD, ENTONCES:
+PASO 1: MODIFICAR TABLA DE TOKEN BD, adicionando nombrecompleto
+ALTER TABLE `personal_access_tokens`
+ADD COLUMN `nombrecompleto` VARCHAR(100);
+
+
+PASO 2: ADICIONAR EN EL MODELO Cliente.php
+public function createPersonalizedToken($tokenName, $abilities = ['*'], $expiration, $additionalInfo = [])
+{
+    $token = $this->createToken($tokenName, $abilities,$expiration);
+
+    // Agregar información adicional al token
+    $token->accessToken->forceFill($additionalInfo)->save();
+
+    return $token;
+}
+
+
+PASO 3: USAR LA FUNCION createPersonalizedToken:
+$NomC = 'LUIS CHOQUE';
+$tokenResult = $admin->createPersonalizedToken('login', ['view-cliente'], now()->addMinutes(60), ['nombrecompleto' => $NomC]);
+
+
+=================================LISTO ACABAMOS CON EL BACKEND CON TOKENS PERSONALIZADOS=========================================
+
+
+
+
+========================GUARDS DE ANGULAR CON LOS TIPOS DE TOKENS (OSEA SEGUN SU name DE TOKEN)============================
+PASO 1: PASAR AL PASO 2
+
+
+PASO 2: CREAR GUARD llamado "soloadmin"
+ng generate guard guards/soloadmin --skip-tests  //crear en modo CAN ACTIVATE
+
+PASO 3: CREAR UN CONTROLLER LLAMADO TokenController
+php artisan make:controller TokenController
+
+PASO 4: PEGAR EL CODIGO EN EL TOKEN CONTROLLER
+<?php
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Laravel\Sanctum\PersonalAccessToken;
+use Carbon\Carbon;
+
+class TokenController extends Controller
+{
+    public function verify(Request $request)
+    {
+        $token = $request->input('token');
+        $tokenParts = explode('|', $token);
+        $tokenId = $tokenParts[0] ?? null;
+        $tokenValue = $tokenParts[1] ?? null;
+
+        if ($tokenId && $tokenValue) {
+            $personalAccessToken = PersonalAccessToken::find($tokenId);
+            if ($personalAccessToken && hash_equals($personalAccessToken->token, hash('sha256', $tokenValue))) {
+                // Verificar si el token ha expirado
+                if ($personalAccessToken->expires_at && Carbon::now()->greaterThan(Carbon::parse($personalAccessToken->expires_at))) {
+                    return response()->json(['message' => 'Token expired'], 401);
+                }
+
+                $user = $personalAccessToken->tokenable;
+                return response()->json(['name' => $personalAccessToken->name, 'user' => $user], 200);
+            }
+        }
+
+        return response()->json(['message' => 'Unauthorized'], 401);
+    }
+}
+
+PASO 5: EN EL ROUTES API
+//PARA VERIFICAR TOKENS //SIRVE PARA LOS GUARD O SABER name DEL TOKEN DB// TAMBIEN SI YA ESTA EXPIRADO
+use App\Http\Controllers\TokenController;
+Route::post('/verify-token', [TokenController::class, 'verify']);
+
+PASO 6: EN EL GUARD DONDE SOLO PERMITIMOS "Admin"
+
+
+import { Injectable } from '@angular/core';
+import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
+import { Observable, of } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class soloadminGuard implements CanActivate {
+  ruta= environment.ruta
+  constructor(protected router: Router, private http: HttpClient) {}
+
+  canActivate(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot): Observable<boolean | UrlTree> | boolean | UrlTree {
+
+    let token = localStorage.getItem("token");
+    if (token) {
+      // Llamar al backend para verificar el token y su expiración
+      return this.http.post<any>(this.ruta+'api/verify-token', { token }).pipe(
+        map(response => {
+          if (response && response.name === 'Admin') {
+            return true;
+          } else {
+            return false;
+          }
+        }),
+        catchError(error => {
+          return of(false);
+        })
+      );
+    } else {
+      return false;
+    }
+  }
+}
+
+
+
