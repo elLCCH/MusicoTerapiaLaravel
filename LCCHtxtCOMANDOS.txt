@@ -3,6 +3,7 @@ ng g c name --skip-tests //crear componente
 ng generate module componentes/gestiones/name --routing //crear modulos
 ng g service servicios/gestiones/name --skip-tests
 ng g interceptor auth --skip-tests
+ng generate pipe pipes/filterapellidosnombrescarnet --skip-tests
 
 //=====================================NEW PROYECT?=======================
 --NUEVO ENVIRONMENT
@@ -562,6 +563,15 @@ public function createPersonalizedToken($tokenName, $abilities = ['*'], $expirat
 PASO 3: USAR LA FUNCION createPersonalizedToken:
 $NomC = 'LUIS CHOQUE';
 $tokenResult = $admin->createPersonalizedToken('login', ['view-cliente'], now()->addMinutes(60), ['nombrecompleto' => $NomC]);
+
+
+
+===============================CONFIGURACION DE ZONA HORARIA EN EL LARAVEL PARA LOS TOKENS=======================
+PASO 1: EN .env
+
+usar eso:
+APP_TIMEZONE=America/La_Paz
+
 
 
 =================================LISTO ACABAMOS CON EL BACKEND CON TOKENS PERSONALIZADOS=========================================

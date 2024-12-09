@@ -1,0 +1,118 @@
+===========COSAS HTML DE NO OLVIDAR============
+
+<div class="button">
+  <button data-bs-toggle="modal" data-bs-target="#modalgestionClientes" class="btn mouse-dir primary">Añadir Clientes<span class="dir-part"></span></button>
+  <button data-bs-toggle="modal" data-bs-target="#modalgestionClientes" class="btn mouse-dir primary">
+    <span *ngIf="true" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+  </button>
+</div>
+
+
+
+===============PARA CREAR FORM GROUPS==============
+
+PODEMOS CREAR DESDE EL SERVICIO groupforms
+createFormGroupClientes(): FormGroup {
+    return new FormGroup({
+        id:new FormControl(0),
+        nombres:new FormControl('',[Validators.required]),
+        apellidos:new FormControl('',[Validators.required]),
+        carnet:new FormControl(''),
+        celular:new FormControl('',),
+        fechnac:new FormControl('',),
+        edad:new FormControl('',),
+        usuario:new FormControl('',),
+        contrasenia:new FormControl('',),
+        foto:new FormControl(''),
+    })
+}
+entonces en el COMPONENTE PONER:
+this.newClientes = this._cli.createFormGroupClientes(); //PONER EN EL CONSTRUCTOR
+newClientes: FormGroup;
+
+
+================PARA PONER PAGINATOR Y PIPES===================
+npm install ngx-pagination --save
+en el modulo poner:
+import { NgxPaginationModule } from 'ngx-pagination';
+import { PipesModule } from 'src/app/pipes/pipes.module';
+//en el import
+NgxPaginationModule,
+PipesModule
+
+//PONER ABAJO DE TABLA
+<pagination-controls (pageChange)="paginaClientes = $event"
+  maxSize="9"
+  directionLinks="true"
+  autoHide="false"
+  responsive="true"
+  previousLabel="Anterior"
+  nextLabel="Siguiente">
+  </pagination-controls>
+
+  en los tr:
+  | filterapellidosnombrescarnet:filtertxtClientes| paginate: { itemsPerPage: 2, currentPage: paginaClientes }
+
+
+
+en el ts
+paginaClientes: number = 1; // Variable de página actual para la paginación
+  isLoadingClientes: boolean = true; //animacion de carga de tabña
+  filtertxtClientes='' //para busqueda
+
+
+
+  =======EJEMPLO DE PIPE... DEBERA SER standalone false
+
+  import { Pipe, PipeTransform } from '@angular/core';
+
+@Pipe({
+  name: 'filterapellidosnombrescarnet',
+  standalone: false
+})
+export class FilterapellidosnombrescarnetPipe implements PipeTransform {
+
+  transform(usuarios: any[], filtro: string): any[] {
+    // const normalizedSearchText = arg.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase(); //ESTO PARECE QUES PARA RESOLVER LAS TILDES
+    if (!filtro) {
+      return usuarios;
+    }
+
+    const palabrasFiltro = filtro.trim().toLowerCase().split(' ').filter(palabra => palabra); // Dividir el filtro en palabras y limpiar palabras vacías
+
+    return usuarios.filter(usuario =>
+      palabrasFiltro.every(palabra =>
+        this.normalizarTexto(usuario.apellidos).toLowerCase().includes(this.normalizarTexto(palabra)) || // Verificar si cada palabra está presente en el nombre del usuario
+        this.normalizarTexto(usuario.nombres).toLowerCase().includes(this.normalizarTexto(palabra)) ||
+        this.normalizarTexto(usuario.carnet).toLowerCase().includes(this.normalizarTexto(palabra))
+      )
+    );
+  }
+  private normalizarTexto(texto: string): string {
+    if (texto == null) {
+      texto=' '
+    }
+    return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); // Eliminar diacríticos (tildes, etc.)
+  }
+}
+
+
+MODULOS DE PIPE
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FilterapellidosnombrescarnetPipe } from './filters/filterapellidosnombrescarnet.pipe';
+
+
+
+@NgModule({
+  declarations: [
+    FilterapellidosnombrescarnetPipe
+  ],
+  imports: [
+    CommonModule,
+  ],
+  exports:[
+    FilterapellidosnombrescarnetPipe
+  ]
+})
+export class PipesModule { }

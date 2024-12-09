@@ -28,7 +28,7 @@ class AuthController extends Controller
             // $tokenResult = $admin->createToken("Docente");
             // $tokenResult = $admin->createToken('Docente', ['*'], now()->addMinutes(60));
             $NomC = $admin->apellidos.' '.$admin->nombres;
-            $tokenResult = $admin->createPersonalizedToken('Admin', ['view-cliente'], now()->addMinutes(60), ['nombrecompleto' => $NomC]);
+            $tokenResult = $admin->createPersonalizedToken('Admin', ['*'], now()->addMinutes(60), ['nombrecompleto' => $NomC]);
             $token = $tokenResult->plainTextToken;
 
             // responder
