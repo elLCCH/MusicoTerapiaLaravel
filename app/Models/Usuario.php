@@ -3,19 +3,25 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-// class Cliente extends Model
-class Cliente extends Authenticatable
+class Usuario extends Authenticatable
 {
     use HasApiTokens, HasFactory;
-    protected $table = 'clientes';
+    protected $table = 'usuarios';
     // Lista de atributos asignables
     protected $fillable = [
-        'nombres', 'apellidos', 'usuario', 'contrasenia', 'celular', 'edad', 'fechnac', 'carnet', 'foto'
+        'nombres',
+        'apellidos',
+        'usuario',
+        'contrasenia',
+        'celular',
+        'celulartrabajo',
+        'carnet',
+        'foto',
+        'tipo'
     ];
     public function createPersonalizedToken($tokenName, $abilities, $expiration, $additionalInfo = [])
     {

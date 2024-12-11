@@ -1,8 +1,8 @@
 ===========COSAS HTML DE NO OLVIDAR============
 
 <div class="button">
-  <button data-bs-toggle="modal" data-bs-target="#modalgestionClientes" class="btn mouse-dir primary">Añadir Clientes<span class="dir-part"></span></button>
-  <button data-bs-toggle="modal" data-bs-target="#modalgestionClientes" class="btn mouse-dir primary">
+  <button class="btn mouse-dir primary">Añadir Clientes<span class="dir-part"></span></button>
+  <button class="btn mouse-dir primary">
     <span *ngIf="true" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
   </button>
 </div>

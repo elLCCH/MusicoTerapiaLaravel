@@ -9,7 +9,6 @@ use Illuminate\Routing\Controller;
 
 class ClienteController extends Controller
 {
-
     public function __construct() {
         $this->middleware(UpdateTokenExpiration::class);
     }
@@ -47,5 +46,5 @@ class ClienteController extends Controller
         Cliente::destroy($id);
         return response()->json(['data' => 'ELIMINADO EXITOSAMENTE']);
     }
-    //#region Fin Controller de Crud PHP de Cliente
+    //#endregion Fin Controller de Crud PHP de Cliente
 }
