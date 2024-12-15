@@ -47,4 +47,8 @@ class ArchivosPagoController extends Controller
         return response()->json(['data' => 'ELIMINADO EXITOSAMENTE']);
     }
     //#endregion Fin Controller de Crud PHP de ArchivosPago
+    public function AllInfoArchivosPagos($id) {
+        $ArchivosPago = ArchivosPago::where('id_pago','=',$id)->get();
+        return response()->json(['data' => $ArchivosPago]);
+    }
 }

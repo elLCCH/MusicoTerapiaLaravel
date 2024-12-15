@@ -53,9 +53,16 @@ Route::middleware(['auth:sanctum'])->group(function () {
 //SOLO SUPER ADMINISTRADOR
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::middleware([CheckAbilities::class . ':superadmin'])->group(function () {
+        //ARCHIVOS PAGOS
         Route::resource('ArchivosPagos', 'App\Http\Controllers\ArchivosPagoController');
+        Route::get('AllInfoArchivosPagos/{id}', 'App\Http\Controllers\ArchivosPagoController@AllInfoArchivosPagos')->middleware([CheckAbilities::class . ':show-cliente']);
+        //CICLOS
         Route::resource('Ciclos', 'App\Http\Controllers\CicloController');
+        Route::get('AllInfoCiclos/{id}', 'App\Http\Controllers\CicloController@AllInfoCiclos')->middleware([CheckAbilities::class . ':show-cliente']);
+        //INFO CLIENTES
         Route::resource('InfoClientes', 'App\Http\Controllers\InfoClienteController');
+        Route::get('AllInfoClientes/{id}', 'App\Http\Controllers\InfoClienteController@AllInfoClientes')->middleware([CheckAbilities::class . ':show-cliente']);
+
         Route::resource('Inicios', 'App\Http\Controllers\InicioController');
         Route::resource('MatrizEscalas', 'App\Http\Controllers\MatrizEscalaController');
         Route::resource('Pagos', 'App\Http\Controllers\PagoController');

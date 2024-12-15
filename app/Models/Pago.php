@@ -20,4 +20,10 @@ class Pago extends Model
         'tipo',
         'descuento'
     ];
+
+    //LOGRAR MULTI ARRAY
+    // Definir la relación con los ciclos
+    public function ciclos() {
+        return $this->hasMany(Ciclo::class, 'id_pago');
+    }
 }

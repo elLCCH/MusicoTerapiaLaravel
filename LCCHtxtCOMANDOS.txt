@@ -1,5 +1,5 @@
 php artisan make:model Cliente --resource //CREAR MODELO Y CONTROLADOR
-ng g c name --skip-tests //crear componente
+ng g c componentes/gestiones/name --skip-tests //crear componente
 ng generate module componentes/gestiones/name --routing //crear modulos
 ng g service servicios/gestiones/name --skip-tests
 ng g interceptor auth --skip-tests
@@ -12,7 +12,7 @@ ng generate pipe pipes/filterapellidosnombrescarnet --skip-tests
 //DESARROLLO
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:3000/api' // Ajusta esta URL a tu API de desarrollo
+  apiUrl: 'http://localhost:8000/api' // Ajusta esta URL a tu API de desarrollo
 };
 //PRODUCCION
 export const environment = {

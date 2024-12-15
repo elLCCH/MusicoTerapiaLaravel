@@ -47,4 +47,8 @@ class CicloController extends Controller
         return response()->json(['data' => 'ELIMINADO EXITOSAMENTE']);
     }
     //#endregion Fin Controller de Crud PHP de Ciclo
+    public function AllInfoCiclos($id) {
+        $Ciclos = Ciclo::where('id_pago','=',$id)->get();
+        return response()->json(['data' => $Ciclos]);
+    }
 }

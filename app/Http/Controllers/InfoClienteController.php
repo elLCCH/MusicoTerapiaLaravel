@@ -47,4 +47,9 @@ class InfoClienteController extends Controller
         return response()->json(['data' => 'ELIMINADO EXITOSAMENTE']);
     }
     //#endregion Fin Controller de Crud PHP de InfoCliente
+
+    public function AllInfoClientes($id) {
+        $InfoCliente = InfoCliente::where('id_cliente','=',$id)->get();
+        return response()->json(['data' => $InfoCliente]);
+    }
 }

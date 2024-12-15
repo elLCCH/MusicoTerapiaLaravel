@@ -16,7 +16,8 @@ class PagoController extends Controller
     //#region Inicio Controller de Crud PHP de Pago
     public function index()
     {
-        $Pago = Pago::all();
+        // $Pago = Pago::all();
+        $Pago = Pago::with('ciclos')->get();
         return response()->json(['data' => $Pago]);
     }
 
