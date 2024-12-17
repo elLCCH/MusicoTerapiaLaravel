@@ -15,7 +15,8 @@ class PlandeIntervencionController extends Controller
     //#region Inicio Controller de Crud PHP de PlandeIntervencion
     public function index()
     {
-        $PlandeIntervencion = PlandeIntervencion::all();
+        // $PlandeIntervencion = PlandeIntervencion::all();
+        $PlandeIntervencion = PlandeIntervencion::with('subplandeintervencion')->get();
         return response()->json(['data' => $PlandeIntervencion]);
     }
 

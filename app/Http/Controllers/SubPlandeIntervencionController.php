@@ -48,4 +48,19 @@ class SubPlandeIntervencionController extends Controller
         return response()->json(['data' => 'ELIMINADO EXITOSAMENTE']);
     }
     //#endregion Fin Controller de Crud PHP de SubPlandeIntervencion
+    public function AllInfoSubPlandeIntervencions($id) {
+        $SubPlandeIntervencion = SubPlandeIntervencion::where('id_plandeintervencion','=',$id)->get();
+        return response()->json(['data' => $SubPlandeIntervencion]);
+    }
+    public function eliminarsubplandeintervencionsxdata(Request $request)
+    {
+        $idplanintervencion = $request->input('id_plandeintervencion');
+        SubPlandeIntervencion::where('id_plandeintervencion', $request->input('id_plandeintervencion'))
+            ->where('categoria', $request->input('categoria'))
+            ->where('nombre', $request->input('nombre'))
+            ->delete();
+
+        return response()->json(['data' => $idplanintervencion]);
+    }
+
 }

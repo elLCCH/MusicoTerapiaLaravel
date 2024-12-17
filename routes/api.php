@@ -68,8 +68,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::resource('Pagos', 'App\Http\Controllers\PagoController');
         Route::resource('PlandeIntervencions', 'App\Http\Controllers\PlandeIntervencionController');
         Route::resource('PlandeIntervencionsCiclos', 'App\Http\Controllers\PlandeIntervencionsCiclosController');
+        //SUB MATRIZ ESCALAS
         Route::resource('SubMatrizEscalas', 'App\Http\Controllers\SubMatrizEscalaController');
+        Route::get('AllInfoSubMatrizEscalas/{id}', 'App\Http\Controllers\SubMatrizEscalaController@AllInfoSubMatrizEscalas')->middleware([CheckAbilities::class . ':show-cliente']);
+        //SUB PLAN DE INTERVENCIONES
         Route::resource('SubPlandeIntervencions', 'App\Http\Controllers\SubPlandeIntervencionController');
+        Route::get('AllInfoSubPlandeIntervencions/{id}', 'App\Http\Controllers\SubPlandeIntervencionController@AllInfoSubPlandeIntervencions')->middleware([CheckAbilities::class . ':show-cliente']);
+        Route::post('eliminarsubplandeintervencionsxdata','App\Http\Controllers\SubPlandeIntervencionController@eliminarsubplandeintervencionsxdata')->middleware([CheckAbilities::class . ':show-cliente']);
+
         Route::resource('Usuarios', 'App\Http\Controllers\UsuarioController');
     });
 });

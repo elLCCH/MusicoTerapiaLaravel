@@ -25,7 +25,8 @@ class PagoController extends Controller
     public function store(Request $request)
     {
         $Pago = $request->all();
-        Pago::insert($Pago);
+        // $Pago = Pago::insert($Pago);
+        $Pago = Pago::create($Pago);
         return response()->json(['data' => $Pago]);
     }
 

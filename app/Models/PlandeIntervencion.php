@@ -12,6 +12,7 @@ class PlandeIntervencion extends Model
     protected $table = 'plandeintervencions';
     // Lista de atributos asignables
     protected $fillable = [
+        'orden',
         'id_infocliente',
         'momento',
         'objetivo',
@@ -20,4 +21,8 @@ class PlandeIntervencion extends Model
         'enfoque',
         'duracion'
     ];
+    //LOGRAR MULTI ARRAY //REUNIR ACA
+    public function subplandeintervencion() {
+        return $this->hasMany(SubPlandeIntervencion::class, 'id_plandeintervencion');
+    }
 }

@@ -94,6 +94,7 @@ CREATE OR REPLACE TABLE ciclos (
 
 CREATE OR REPLACE TABLE plandeintervencions (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    orden INT NULL,
     id_infocliente INT NOT NULL,
     momento VARCHAR(40) NULL,
     objetivo VARCHAR(40) NULL,
@@ -170,7 +171,9 @@ CREATE TABLE `personal_access_tokens` (
     `name` VARCHAR(255) NOT NULL,
     `token` VARCHAR(64) NOT NULL,
     `abilities` TEXT,
+    `expires_at` TIMESTAMP NULL,
     `last_used_at` TIMESTAMP NULL,
+    `nombrecompleto` VARCHAR(80) NULL,
     `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),

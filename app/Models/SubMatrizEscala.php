@@ -16,4 +16,8 @@ class SubMatrizEscala extends Model
         'tipo',
         'nombresubmatriz'
     ];
+    //LOGRAR MULTI ARRAY
+    public function matrizescala() {
+        return $this->belongsTo(MatrizEscala::class, 'id_matrizescala');
+    }
 }

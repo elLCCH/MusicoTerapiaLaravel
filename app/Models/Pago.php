@@ -21,8 +21,7 @@ class Pago extends Model
         'descuento'
     ];
 
-    //LOGRAR MULTI ARRAY
-    // Definir la relación con los ciclos
+    //LOGRAR MULTI ARRAY //REUNIR ACA
     public function ciclos() {
         return $this->hasMany(Ciclo::class, 'id_pago');
     }

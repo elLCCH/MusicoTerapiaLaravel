@@ -16,4 +16,8 @@ class MatrizEscala extends Model
         'nombrematriz',
         'valor'
     ];
+    //LOGRAR MULTI ARRAY //REUNIR ACA
+    public function submatrizescala() {
+        return $this->hasMany(SubMatrizEscala::class, 'id_matrizescala');
+    }
 }

@@ -16,7 +16,8 @@ class MatrizEscalaController extends Controller
     //#region Inicio Controller de Crud PHP de MatrizEscala
     public function index()
     {
-        $MatrizEscala = MatrizEscala::all();
+        // $MatrizEscala = MatrizEscala::all();
+        $MatrizEscala = MatrizEscala::with('submatrizescala')->get();
         return response()->json(['data' => $MatrizEscala]);
     }
 

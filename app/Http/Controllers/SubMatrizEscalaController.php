@@ -47,4 +47,8 @@ class SubMatrizEscalaController extends Controller
         return response()->json(['data' => 'ELIMINADO EXITOSAMENTE']);
     }
     //#endregion Fin Controller de Crud PHP de SubMatrizEscala
+    public function AllInfoSubMatrizEscalas($id) {
+        $SubMatrizEscala = SubMatrizEscala::where('id_matrizescala','=',$id)->get();
+        return response()->json(['data' => $SubMatrizEscala]);
+    }
 }

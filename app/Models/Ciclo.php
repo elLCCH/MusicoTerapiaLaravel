@@ -21,7 +21,7 @@ class Ciclo extends Model
         'eri',
         'cim'
     ];
-    //LOGRAR MULTI ARRAY
+    //LOGRAR MULTI ARRAY //USAR PARA INCORPORACION
     public function pago() {
         return $this->belongsTo(Pago::class, 'id_pago');
     }

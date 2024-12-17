@@ -16,4 +16,8 @@ class SubPlandeIntervencion extends Model
         'categoria',
         'nombre'
     ];
+    //LOGRAR MULTI ARRAY //USAR PARA INCORPORACION
+    public function plandeintervencion() {
+        return $this->belongsTo(PlandeIntervencion::class, 'id_plandeintervencion');
+    }
 }

@@ -3,7 +3,7 @@ ng g c componentes/gestiones/name --skip-tests //crear componente
 ng generate module componentes/gestiones/name --routing //crear modulos
 ng g service servicios/gestiones/name --skip-tests
 ng g interceptor auth --skip-tests
-ng generate pipe pipes/filterapellidosnombrescarnet --skip-tests
+ng generate pipe pipes/filters/filterapellidosnombrescarnet --skip-tests
 
 //=====================================NEW PROYECT?=======================
 --NUEVO ENVIRONMENT
