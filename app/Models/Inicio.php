@@ -13,6 +13,7 @@ class Inicio extends Model
     // Lista de atributos asignables
     protected $fillable = [
         'archivo',
+        'etiqueta',
         'titulo',
         'subtitulo',
         'descripcion',

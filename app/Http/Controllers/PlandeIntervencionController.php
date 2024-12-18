@@ -48,4 +48,10 @@ class PlandeIntervencionController extends Controller
         return response()->json(['data' => 'ELIMINADO EXITOSAMENTE']);
     }
     //#endregion Fin Controller de Crud PHP de PlandeIntervencion
+    public function CargarPlandeIntervencionxidInfoCliente($id)
+    {
+        // $PlandeIntervencion = PlandeIntervencion::all();
+        $PlandeIntervencion = PlandeIntervencion::with('subplandeintervencion')->where('id_infocliente','=',$id)->get();
+        return response()->json(['data' => $PlandeIntervencion]);
+    }
 }

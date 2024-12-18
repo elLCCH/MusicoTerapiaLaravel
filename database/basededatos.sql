@@ -152,6 +152,7 @@ CREATE OR REPLACE TABLE submatrizescalas (
 CREATE OR REPLACE TABLE inicios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     archivo VARCHAR(200) NULL,
+    etiqueta VARCHAR(50) NULL,
     titulo VARCHAR(100) NULL,
     subtitulo VARCHAR(100) NULL,
     descripcion TEXT NULL,
