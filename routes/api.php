@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\CheckAbilities;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\FileUploadController;
 
 Route::prefix("v1/auth")->group(function(){ //el prefijo vi/auth funciona como el routing de angular: v1/auth/login
     Route::post('/login', [AuthController::class, "login"]); //EJECUTAR LA FUNCION login desde el authcontroller
@@ -40,14 +41,27 @@ Route::prefix("v1/auth")->group(function(){ //el prefijo vi/auth funciona como e
 use App\Http\Controllers\TokenController;
 Route::post('/verify-token', [TokenController::class, 'verify']);
 
+Route::post('/uploadFile', [FileUploadController::class, 'uploadFile']);
+Route::post('/deleteFile', [FileUploadController::class, 'deleteFile']);
 
 use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\InicioController;
+
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/Clientes', [ClienteController::class, 'index'])->middleware([CheckAbilities::class . ':view-cliente']);
     Route::get('/Clientes/{id}', [ClienteController::class, 'show'])->middleware([CheckAbilities::class . ':show-cliente']);
     Route::post('/Clientes', [ClienteController::class, 'store'])->middleware([CheckAbilities::class . ':create-cliente']);
     Route::put('/Clientes/{id}', [ClienteController::class, 'update'])->middleware([CheckAbilities::class . ':update-cliente']);
     Route::delete('/Clientes/{id}', [ClienteController::class, 'destroy'])->middleware([CheckAbilities::class . ':delete-cliente']);
+});
+
+//INICIOS CONTROLLER
+Route::get('/Inicios', [InicioController::class, 'index']);
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('/Inicios/{id}', [InicioController::class, 'show'])->middleware([CheckAbilities::class . ':show-cliente']);
+    Route::post('/Inicios', [InicioController::class, 'store'])->middleware([CheckAbilities::class . ':create-cliente']);
+    Route::put('/Inicios/{id}', [InicioController::class, 'update'])->middleware([CheckAbilities::class . ':update-cliente']);
+    Route::delete('/Inicios/{id}', [InicioController::class, 'destroy'])->middleware([CheckAbilities::class . ':delete-cliente']);
 });
 
 //SOLO SUPER ADMINISTRADOR
@@ -63,7 +77,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::resource('InfoClientes', 'App\Http\Controllers\InfoClienteController');
         Route::get('AllInfoClientes/{id}', 'App\Http\Controllers\InfoClienteController@AllInfoClientes')->middleware([CheckAbilities::class . ':show-cliente']);
 
-        Route::resource('Inicios', 'App\Http\Controllers\InicioController');
+
         Route::resource('MatrizEscalas', 'App\Http\Controllers\MatrizEscalaController');
         Route::resource('Pagos', 'App\Http\Controllers\PagoController');
 

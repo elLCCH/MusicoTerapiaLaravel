@@ -20,6 +20,7 @@ class Inicio extends Model
         'categoria',
         'link',
         'costo',
+        'duracion',
         'cupos',
         'fecha'
     ];
