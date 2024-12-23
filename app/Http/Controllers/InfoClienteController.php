@@ -15,10 +15,10 @@ class InfoClienteController extends Controller
     //#region Inicio Controller de Crud PHP de InfoCliente
     public function index()
     {
-        $InfoCliente = InfoCliente::all();
+        $InfoCliente = InfoCliente::join('clientes', 'infoclientes.id_cliente', '=', 'clientes.id')
+        ->addSelect('infoclientes.*', 'clientes.nombres', 'clientes.apellidos','clientes.carnet')->get();
         return response()->json(['data' => $InfoCliente]);
     }
-
 
     public function store(Request $request)
     {
@@ -52,4 +52,6 @@ class InfoClienteController extends Controller
         $InfoCliente = InfoCliente::where('id_cliente','=',$id)->get();
         return response()->json(['data' => $InfoCliente]);
     }
+
+
 }

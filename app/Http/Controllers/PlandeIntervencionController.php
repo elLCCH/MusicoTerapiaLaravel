@@ -16,7 +16,10 @@ class PlandeIntervencionController extends Controller
     public function index()
     {
         // $PlandeIntervencion = PlandeIntervencion::all();
-        $PlandeIntervencion = PlandeIntervencion::with('subplandeintervencion')->get();
+        $PlandeIntervencion = PlandeIntervencion::with('subplandeintervencion')
+        ->join('infoclientes', 'plandeintervencions.id_infocliente', '=', 'infoclientes.id')
+        ->join('clientes', 'infoclientes.id_cliente', '=', 'clientes.id')
+        ->addSelect('plandeintervencions.*', 'clientes.nombres', 'clientes.apellidos', 'clientes.celular', 'clientes.carnet')->get();
         return response()->json(['data' => $PlandeIntervencion]);
     }
 
@@ -51,7 +54,11 @@ class PlandeIntervencionController extends Controller
     public function CargarPlandeIntervencionxidInfoCliente($id)
     {
         // $PlandeIntervencion = PlandeIntervencion::all();
-        $PlandeIntervencion = PlandeIntervencion::with('subplandeintervencion')->where('id_infocliente','=',$id)->get();
+        $PlandeIntervencion = PlandeIntervencion::with('subplandeintervencion')
+        ->join('infoclientes', 'plandeintervencions.id_infocliente', '=', 'infoclientes.id')
+        ->join('clientes', 'infoclientes.id_cliente', '=', 'clientes.id')
+        ->addSelect('plandeintervencions.*', 'clientes.nombres', 'clientes.apellidos', 'clientes.celular', 'clientes.carnet')
+        ->where('id_infocliente','=',$id)->get();
         return response()->json(['data' => $PlandeIntervencion]);
     }
 }

@@ -53,10 +53,10 @@ CREATE OR REPLACE TABLE infoclientes (
 CREATE OR REPLACE TABLE pagos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     id_infocliente INT NOT NULL,
-    precio VARCHAR(100) NULL,
-    saldo VARCHAR(100) NULL,
+    precio INT NULL,
+    saldo INT NULL,
     pagado INT NULL,
-    horario DATE NULL,
+    horario VARCHAR(100) NULL,
     tipo VARCHAR(80) NULL,
     descuento VARCHAR(100) NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,

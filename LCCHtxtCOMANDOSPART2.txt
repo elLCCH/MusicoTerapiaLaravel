@@ -116,3 +116,9 @@ import { FilterapellidosnombrescarnetPipe } from './filters/filterapellidosnombr
   ]
 })
 export class PipesModule { }
+
+
+
+////////////////DROP AND DRAG
+npm install --save dropzone
+

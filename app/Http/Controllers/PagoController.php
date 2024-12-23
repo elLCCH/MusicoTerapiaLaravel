@@ -17,10 +17,25 @@ class PagoController extends Controller
     public function index()
     {
         // $Pago = Pago::all();
-        $Pago = Pago::with('ciclos')->get();
+        $Pago = Pago::with('ciclos')
+        ->join('infoclientes', 'pagos.id_infocliente', '=', 'infoclientes.id')
+        ->join('clientes', 'infoclientes.id_cliente', '=', 'clientes.id')
+        ->addSelect('pagos.*', 'clientes.nombres', 'clientes.apellidos', 'clientes.celular', 'clientes.carnet')->get();
         return response()->json(['data' => $Pago]);
     }
+    // public function index()
+    // {
+    //     $InfoCliente = InfoCliente::join('clientes', 'infoclientes.id_cliente', '=', 'clientes.id')
+    //         ->select(
+    //             'infoclientes.*',
+    //             'clientes.nombres',
+    //             'clientes.apellidos',
+    //             'clientes.celular'
+    //         )
+    //         ->get();
 
+    //     return response()->json(['data' => $InfoCliente]);
+    // }
 
     public function store(Request $request)
     {
@@ -50,4 +65,5 @@ class PagoController extends Controller
         return response()->json(['data' => 'ELIMINADO EXITOSAMENTE']);
     }
     //#endregion Fin Controller de Crud PHP de Pago
+
 }

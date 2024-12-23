@@ -16,19 +16,19 @@ class FileUploadController extends Controller
 
         switch ($request->input('type')) {
             case 'GALERIA':
-                $path = 'CertificadosNacDocumentos';
+                $path = 'ArchivosCrud/GaleriasFiles';
                 break;
             case 'CAROUSEL':
-                $path = 'CIDocumentos';
+                $path = 'ArchivosCrud/CarouselesFiles';
                 break;
             case 'ARCHIVOSPAGO':
-                $path = 'BoletaDocumentos';
+                $path = 'ArchivosCrud/ArchivosPagosFiles';
                 break;
             case 'CLIENTE':
-                $path = 'DocColUniDocumentos';
+                $path = 'ArchivosCrud/ClientesFiles';
                 break;
             case 'USUARIO':
-                $path = 'BoletasEventos';
+                $path = 'ArchivosCrud/UsuariosFiles';
                 break;
             default:
                 return response()->json(['error' => 'Tipo de archivo no válido'], 400);
