@@ -33,6 +33,7 @@ CREATE OR REPLACE TABLE infoclientes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     id_cliente INT NOT NULL,
     diagnostico VARCHAR(100) NULL,
+    residenciaactual VARCHAR(250) NULL,
     tipotratamiento VARCHAR(100) NULL,
     duracion INT NULL,
     fechaadmision DATE NULL,
@@ -45,6 +46,7 @@ CREATE OR REPLACE TABLE infoclientes (
     social VARCHAR(300) NULL,
     metodosausar VARCHAR(300) NULL,
     notas TEXT NULL,
+    cuestionario TEXT NULL,
     created_at DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (id_cliente) REFERENCES clientes(id) ON UPDATE CASCADE ON DELETE CASCADE
@@ -72,6 +74,7 @@ CREATE OR REPLACE TABLE archivospagos (
     horapago TIME NULL,
     file VARCHAR(300) NULL,
     observacion TEXT NULL,
+    estadopago VARCHAR(50) NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (id_pago) REFERENCES pagos(id) ON UPDATE CASCADE ON DELETE CASCADE

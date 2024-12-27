@@ -17,6 +17,7 @@ class ArchivosPago extends Model
         'fechapago',
         'horapago',
         'file',
-        'observacion'
+        'observacion',
+        'estadopago'
     ];
 }

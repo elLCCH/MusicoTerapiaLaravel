@@ -20,7 +20,7 @@ class PagoController extends Controller
         $Pago = Pago::with('ciclos')
         ->join('infoclientes', 'pagos.id_infocliente', '=', 'infoclientes.id')
         ->join('clientes', 'infoclientes.id_cliente', '=', 'clientes.id')
-        ->addSelect('pagos.*', 'clientes.nombres', 'clientes.apellidos', 'clientes.celular', 'clientes.carnet')->get();
+        ->addSelect('pagos.*', 'clientes.nombres', 'clientes.apellidos', 'clientes.celular', 'clientes.carnet','infoclientes.fechaadmision')->get();
         return response()->json(['data' => $Pago]);
     }
     // public function index()

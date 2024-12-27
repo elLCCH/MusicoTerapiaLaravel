@@ -19,7 +19,7 @@ class PlandeIntervencionController extends Controller
         $PlandeIntervencion = PlandeIntervencion::with('subplandeintervencion')
         ->join('infoclientes', 'plandeintervencions.id_infocliente', '=', 'infoclientes.id')
         ->join('clientes', 'infoclientes.id_cliente', '=', 'clientes.id')
-        ->addSelect('plandeintervencions.*', 'clientes.nombres', 'clientes.apellidos', 'clientes.celular', 'clientes.carnet')->get();
+        ->addSelect('plandeintervencions.*', 'clientes.nombres', 'clientes.apellidos', 'clientes.celular', 'clientes.carnet','infoclientes.fechaadmision')->get();
         return response()->json(['data' => $PlandeIntervencion]);
     }
 

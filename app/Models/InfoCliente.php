@@ -14,6 +14,7 @@ class InfoCliente extends Model
     protected $fillable = [
         'id_cliente',
         'diagnostico',
+        'residenciaactual',
         'tipotratamiento',
         'duracion',
         'fechaadmision',
