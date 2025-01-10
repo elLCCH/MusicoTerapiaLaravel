@@ -15,7 +15,7 @@ class SubMatrizEscalaController extends Controller
     //#region Inicio Controller de Crud PHP de SubMatrizEscala
     public function index()
     {
-        $SubMatrizEscala = SubMatrizEscala::all();
+        $SubMatrizEscala = SubMatrizEscala::orderBy('id_matrizescala', 'asc')->orderBy('tipo', 'asc')->orderBy('nombresubmatriz', 'asc')->get();
         return response()->json(['data' => $SubMatrizEscala]);
     }
 
@@ -48,7 +48,7 @@ class SubMatrizEscalaController extends Controller
     }
     //#endregion Fin Controller de Crud PHP de SubMatrizEscala
     public function AllInfoSubMatrizEscalas($id) {
-        $SubMatrizEscala = SubMatrizEscala::where('id_matrizescala','=',$id)->get();
+        $SubMatrizEscala = SubMatrizEscala::where('id_matrizescala','=',$id)->orderBy('id_matrizescala', 'asc')->orderBy('tipo', 'asc')->orderBy('nombresubmatriz', 'asc')->get();
         return response()->json(['data' => $SubMatrizEscala]);
     }
 }

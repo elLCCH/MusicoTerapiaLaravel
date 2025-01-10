@@ -15,7 +15,7 @@ class ArchivosPagoController extends Controller
     //#region Inicio Controller de Crud PHP de ArchivosPago
     public function index()
     {
-        $ArchivosPago = ArchivosPago::all();
+        $ArchivosPago = ArchivosPago::orderBy('fechapago', 'desc')->orderBy('horapago', 'desc')->get();
         return response()->json(['data' => $ArchivosPago]);
     }
 
@@ -48,7 +48,7 @@ class ArchivosPagoController extends Controller
     }
     //#endregion Fin Controller de Crud PHP de ArchivosPago
     public function AllInfoArchivosPagos($id) {
-        $ArchivosPago = ArchivosPago::where('id_pago','=',$id)->get();
+        $ArchivosPago = ArchivosPago::where('id_pago','=',$id)->orderBy('fechapago', 'desc')->orderBy('horapago', 'desc')->get();
         return response()->json(['data' => $ArchivosPago]);
     }
 }

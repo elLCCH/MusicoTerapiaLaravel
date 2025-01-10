@@ -122,3 +122,183 @@ export class PipesModule { }
 ////////////////DROP AND DRAG
 npm install --save dropzone
 
+///////
+PARA QUILL editor de texto
+paso 1: npm install quill@2.0.3
+
+paso 2: luego copiar de algun otro proyecto su assets/dist/quill copiar y pegar en nueztro proyecto
+
+paso 3: en estilos globales copiar y pegar esto
+
+/* #region EDITORES DISEÑO QUILL */
+@import './assets/dist/quill/quill.snow.css';
+@import './assets/dist/quill/quill.core.css';
+/* @import './assets/dist/quill/quill.bubble.css'; */
+.ql-container {
+  border: 2px solid #ffffff;
+  border-radius: 5px;
+  /* padding: 10px; */
+  color: black;
+}
+
+.ql-editor {
+  font-size: 14px;
+  line-height: 1.5;
+
+  background-image: linear-gradient(to bottom, #ffffff2a, #fff);
+  box-shadow: 2px 2px 4px rgb(0, 0, 0);
+  border-radius: 5px;
+  /* padding: 5px 10px; */
+  transition: all 0.2s ease-in-out;
+  font-size: 14px;
+  color: #333;
+
+}
+/* .ql-video {
+  width: 650px;
+  height: 366px;
+}
+@media (max-width: 768px) {
+  .ql-video {
+    width: 100%;
+    height: auto;
+  }
+}*/
+/* PARA Q OCUPE EL 100% HORIZONTALMENTE */
+.quill-container-wrapper {
+  display: flex;
+  width: 100%;
+}
+/*HACIENDO MAS BONITO LOS BOTONES*/
+.ql-toolbar button {
+  background-image: linear-gradient(to bottom, #f0f0f0, #fff);
+  box-shadow: 4px 4px 4px rgb(255, 255, 255);
+  border-radius: 5px;
+  padding: 5px 10px;
+  transition: all 0.2s ease-in-out;
+  font-size: 14px;
+  color: #333;
+}
+
+.ql-toolbar button:hover {
+  transform: scale(1.05);
+  box-shadow: 6px 6px 8px rgb(0, 0, 0);
+  background-color: #e0e0e0;
+}
+/* DISEÑO DE CADA CATEGORIA */
+.ql-formats{
+  background-image: linear-gradient(to bottom, #fff, #c0baba00);
+  box-shadow: 2px 2px 4px rgb(0, 0, 0);
+  border-radius: 5px;
+  padding: 5px 10px;
+  transition: all 0.2s ease-in-out;
+  font-size: 14px;
+  color: #333;
+
+}
+/* DISEÑO DE TODO EL TOOL BAR */
+.ql-toolbar{
+  /* background-image: linear-gradient(to bottom, #f0f0f0, #fff); */
+  background-image: linear-gradient(to bottom, #fff, #c0baba00);
+  box-shadow: 2px 2px 4px rgb(0, 0, 0);
+  border-radius: 5px;
+  padding: 5px 10px;
+  transition: all 0.2s ease-in-out;
+  font-size: 14px;
+  color: #333;
+}
+
+
+/* #endregion EDITORES DISEÑO QUILL */
+
+paso 4: LUEGO ESTE ES EL EJEMPLO:
+HTML
+ <div id="editor-container" style="height: 300px; border: 1px solid #ccc;">asd</div>
+ <button (click)="getContent()">Obtener contenido</button>
+ <p>{{ output }}</p>
+
+
+ TS
+ import Quill from 'quill';
+//#region QUILL EDITOR IMPLEMENTACION
+  editor!: Quill;
+  output: string = '';
+
+  ngAfterViewInit(): void {
+    const toolbarOptions = [
+      ['bold', 'italic', 'underline', 'strike'], // Formatos básicos
+      [{ 'header': 1 }, { 'header': 2 }], // Encabezados
+      [{ 'list': 'ordered' }, { 'list': 'bullet' }], // Listas ordenadas y con viñetas
+      [{ 'script': 'sub' }, { 'script': 'super' }], // Subíndice y superíndice
+      [{ 'indent': '-1' }, { 'indent': '+1' }], // Indentación
+      [{ 'direction': 'rtl' }], // Dirección de texto (de derecha a izquierda)
+      [{ 'size': ['small', false, 'large', 'huge'] }], // Tamaños de texto
+      [{ 'header': [1, 2, 3, 4, 5, 6, false] }], // Niveles de encabezado
+      [{ 'color': [] }, { 'background': [] }], // Colores de texto y fondo
+      [{ 'font': [] }], // Fuentes
+      [{ 'align': [] }], // Alineación de texto
+      ['link', 'video'], // Insertar enlaces, imágenes y videos
+      ['clean'], // Eliminar formato
+    ];
+
+    this.editor = new Quill('#editor-container', {
+      theme: 'snow', // Tema Snow (estilo predeterminado)
+      modules: {
+        toolbar: {
+          container: toolbarOptions, // Configuración de la barra de herramientas
+        },
+      },
+      placeholder: 'Escribe aquí...',
+      formats: [
+        'bold', 'italic', 'underline', 'strike', // Formatos básicos
+        'header', 'list', 'bullet', 'script', // Encabezados, listas y sub/superíndice
+        'indent', 'direction', 'size', 'color', 'background', // Otros formatos
+        'font', 'align', 'link', 'video', // Fuentes y multimedia
+      ],
+    });
+  }
+
+  getContent(): void {
+    this.output = this.editor.root.innerHTML;
+    console.log('Contenido del editor:', this.output);
+  }
+
+
+  //////////////MEJOR ESTE
+    npm install ngx-quill@26 (26 X Q ES COMPATIBLE CON ANGULAR 18)
+    npm install --save-dev @types/quill
+
+
+    SERVICIO
+    modulesQuillEdicion={
+        toolbar:[
+        ['bold', 'italic', 'underline', 'strike'], // Formatos básicos
+        [{ 'header': 1 }, { 'header': 2 }], // Encabezados
+        [{ 'list': 'ordered' }, { 'list': 'bullet' }], // Listas ordenadas y con viñetas
+        [{ 'script': 'sub' }, { 'script': 'super' }], // Subíndice y superíndice
+        [{ 'indent': '-1' }, { 'indent': '+1' }], // Indentación
+        [{ 'direction': 'rtl' }], // Dirección de texto (de derecha a izquierda)
+        [{ 'size': ['small', false, 'large', 'huge'] }], // Tamaños de texto
+        [{ 'header': [1, 2, 3, 4, 5, 6, false] }], // Niveles de encabezado
+        [{ 'color': [] }, { 'background': [] }], // Colores de texto y fondo
+        [{ 'font': [] }], // Fuentes
+        [{ 'align': [] }], // Alineación de texto
+        ['link', 'video'], // Insertar enlaces, imágenes y videos
+        ['clean'], // Eliminar formato
+        ]
+    }
+    modulesQuillShow={
+        toolbar:''
+    }
+
+    MODULO:
+    import {QuillModule} from 'ngx-quill';
+    IMPORT [QuillModule]
+
+
+    MODO LECTURA:
+    <quill-editor class="quill-container-wrapper" [modules]="_tools.modulesQuillShow" [(ngModel)]="a.notas"></quill-editor>
+    MODO EDICION:
+    <quill-editor class="quill-container-wrapper" [modules]="_tools.modulesQuillEdicion" formControlName="notas"></quill-editor>
+
+  //#endregion QUILL EDITOR

@@ -15,7 +15,7 @@ class InicioController extends Controller
     //#region Inicio Controller de Crud PHP de Inicio
     public function index()
     {
-        $Inicio = Inicio::all();
+        $Inicio = Inicio::orderBy('categoria', 'asc')->orderBy('titulo', 'asc')->orderBy('id', 'desc')->orderBy('fecha', 'desc')->get();
         return response()->json(['data' => $Inicio]);
     }
 

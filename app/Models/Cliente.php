@@ -15,7 +15,7 @@ class Cliente extends Authenticatable
     protected $table = 'clientes';
     // Lista de atributos asignables
     protected $fillable = [
-        'nombres', 'apellidos', 'usuario', 'contrasenia', 'celular', 'edad', 'fechnac', 'carnet', 'foto'
+        'nombres', 'apellidos', 'usuario', 'contrasenia', 'celular', 'edad', 'fechnac', 'carnet', 'foto','estado'
     ];
     public function createPersonalizedToken($tokenName, $abilities, $expiration, $additionalInfo = [])
     {

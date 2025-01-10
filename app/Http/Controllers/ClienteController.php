@@ -15,7 +15,7 @@ class ClienteController extends Controller
    //#region Inicio Controller de Crud PHP de Cliente
     public function index()
     {
-        $Cliente = Cliente::all();
+        $Cliente = Cliente::orderBy('id', 'desc')->get();
         return response()->json(['data' => $Cliente]);
     }
 

@@ -17,7 +17,7 @@ class MatrizEscalaController extends Controller
     public function index()
     {
         // $MatrizEscala = MatrizEscala::all();
-        $MatrizEscala = MatrizEscala::with('submatrizescala')->get();
+        $MatrizEscala = MatrizEscala::with('submatrizescala')->orderBy('categoria', 'asc')->orderBy('nombrematriz', 'asc')->get();
         return response()->json(['data' => $MatrizEscala]);
     }
 

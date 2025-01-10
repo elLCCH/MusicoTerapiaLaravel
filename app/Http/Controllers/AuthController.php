@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cliente;
+use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -20,22 +22,41 @@ class AuthController extends Controller
         // verificar
         $user = $request->input('usuario');
         $pass = $request->input('contrasenia');
+        $login =false;
+        // $admin = Cliente::where('usuario', '=', $user)->where('contrasenia', '=', $pass)->first();
+        // $admin = Usuario::where('usuario', '=', $user)->where('contrasenia', '=', $pass)->first();
 
-        $admin = Cliente::where('usuario', '=', $user)->where('contrasenia', '=', $pass)->first();
 
-        if ($admin) {
+        $sesion = Usuario::where('usuario','=', $user)->first();
+
+        try {
+            if (Hash::check($pass, $sesion->contrasenia)) {
+                // INICIO DE SESION CORRECTO
+                $login =true;
+            }
+            else
+            {
+                // NO LOGIN
+                $login =false;
+            }
+        } catch (\Throwable $th) {
+            // NO LOGIN
+            $login =false;
+        }
+        //SI SE LOGRÓ REALIZAR EL LOGIN ENTONCES HACER TOKENS
+        if ($login==true) {
             // generar token
             // $tokenResult = $admin->createToken("Docente");
             // $tokenResult = $admin->createToken('Docente', ['*'], now()->addMinutes(60));
-            $NomC = $admin->apellidos.' '.$admin->nombres;
-            $tokenResult = $admin->createPersonalizedToken('Admin', ['*'], now()->addMinutes(60), ['nombrecompleto' => $NomC]);
+            $NomC = $sesion->apellidos.' '.$sesion->nombres;
+            $tokenResult = $sesion->createPersonalizedToken('Admin', ['*'], now()->addMinutes(60), ['nombrecompleto' => $NomC]);
             $token = $tokenResult->plainTextToken;
 
             // responder
             return response()->json([
                 "access_token" => $token,
                 "token_type" => "Bearer",
-                "usuario" => $admin
+                "usuario" => $sesion
             ]);
         } else {
             return response()->json([

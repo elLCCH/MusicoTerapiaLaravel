@@ -26,6 +26,7 @@ class InfoCliente extends Model
         'cognitivo',
         'social',
         'metodosausar',
-        'notas'
+        'notas',
+        'cuestionario'
     ];
 }

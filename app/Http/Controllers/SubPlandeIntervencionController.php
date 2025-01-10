@@ -16,7 +16,7 @@ class SubPlandeIntervencionController extends Controller
     //#region Inicio Controller de Crud PHP de SubPlandeIntervencion
     public function index()
     {
-        $SubPlandeIntervencion = SubPlandeIntervencion::all();
+        $SubPlandeIntervencion = SubPlandeIntervencion::orderBy('id_plandeintervencion', 'asc')->orderBy('categoria', 'asc')->orderBy('nombre', 'asc')->get();
         return response()->json(['data' => $SubPlandeIntervencion]);
     }
 
@@ -49,7 +49,7 @@ class SubPlandeIntervencionController extends Controller
     }
     //#endregion Fin Controller de Crud PHP de SubPlandeIntervencion
     public function AllInfoSubPlandeIntervencions($id) {
-        $SubPlandeIntervencion = SubPlandeIntervencion::where('id_plandeintervencion','=',$id)->get();
+        $SubPlandeIntervencion = SubPlandeIntervencion::where('id_plandeintervencion','=',$id)->orderBy('id_plandeintervencion', 'asc')->orderBy('categoria', 'asc')->orderBy('nombre', 'asc')->get();
         return response()->json(['data' => $SubPlandeIntervencion]);
     }
     public function eliminarsubplandeintervencionsxdata(Request $request)

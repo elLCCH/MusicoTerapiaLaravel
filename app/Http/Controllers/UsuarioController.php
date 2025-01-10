@@ -6,6 +6,7 @@ use App\Models\Usuario;
 use Illuminate\Http\Request;
 use App\Http\Middleware\UpdateTokenExpiration;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Hash;
 
 class UsuarioController extends Controller
 {
@@ -15,7 +16,7 @@ class UsuarioController extends Controller
     //#region Inicio Controller de Crud PHP de Usuario
     public function index()
     {
-        $Usuario = Usuario::all();
+        $Usuario = Usuario::orderBy('estado', 'asc')->orderBy('apellidos', 'asc')->orderBy('nombres', 'asc')->get();
         return response()->json(['data' => $Usuario]);
     }
 
@@ -23,6 +24,8 @@ class UsuarioController extends Controller
     public function store(Request $request)
     {
         $Usuario = $request->all();
+        $Usuario['contrasenia']= Hash::make($request->input('contrasenia')) ;
+
         Usuario::insert($Usuario);
         return response()->json(['data' => $Usuario]);
     }

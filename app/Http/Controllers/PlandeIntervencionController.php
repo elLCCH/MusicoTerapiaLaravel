@@ -19,7 +19,8 @@ class PlandeIntervencionController extends Controller
         $PlandeIntervencion = PlandeIntervencion::with('subplandeintervencion')
         ->join('infoclientes', 'plandeintervencions.id_infocliente', '=', 'infoclientes.id')
         ->join('clientes', 'infoclientes.id_cliente', '=', 'clientes.id')
-        ->addSelect('plandeintervencions.*', 'clientes.nombres', 'clientes.apellidos', 'clientes.celular', 'clientes.carnet','infoclientes.fechaadmision')->get();
+        ->addSelect('plandeintervencions.*', 'clientes.nombres', 'clientes.apellidos', 'clientes.celular', 'clientes.carnet', 'clientes.estado','infoclientes.fechaadmision')
+        ->orderBy('clientes.estado', 'asc')->orderBy('clientes.apellidos', 'asc')->orderBy('clientes.nombres', 'asc')->orderBy('plandeintervencions.orden', 'asc')->get();
         return response()->json(['data' => $PlandeIntervencion]);
     }
 
@@ -57,8 +58,9 @@ class PlandeIntervencionController extends Controller
         $PlandeIntervencion = PlandeIntervencion::with('subplandeintervencion')
         ->join('infoclientes', 'plandeintervencions.id_infocliente', '=', 'infoclientes.id')
         ->join('clientes', 'infoclientes.id_cliente', '=', 'clientes.id')
-        ->addSelect('plandeintervencions.*', 'clientes.nombres', 'clientes.apellidos', 'clientes.celular', 'clientes.carnet')
-        ->where('id_infocliente','=',$id)->get();
+        ->addSelect('plandeintervencions.*', 'clientes.nombres', 'clientes.apellidos', 'clientes.celular', 'clientes.carnet', 'clientes.carnet','infoclientes.fechaadmision')
+        ->where('id_infocliente','=',$id)
+        ->orderBy('clientes.estado', 'asc')->orderBy('clientes.apellidos', 'asc')->orderBy('clientes.nombres', 'asc')->orderBy('plandeintervencions.orden', 'asc')->get();
         return response()->json(['data' => $PlandeIntervencion]);
     }
 }

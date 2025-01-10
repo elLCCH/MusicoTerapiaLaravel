@@ -15,7 +15,7 @@ class CicloController extends Controller
     //#region Inicio Controller de Crud PHP de Ciclo
     public function index()
     {
-        $Ciclo = Ciclo::all();
+        $Ciclo = Ciclo::orderBy('nrociclo', 'asc')->orderBy('sesion', 'asc')->get();
         return response()->json(['data' => $Ciclo]);
     }
 
@@ -48,7 +48,7 @@ class CicloController extends Controller
     }
     //#endregion Fin Controller de Crud PHP de Ciclo
     public function AllInfoCiclos($id) {
-        $Ciclos = Ciclo::where('id_pago','=',$id)->get();
+        $Ciclos = Ciclo::where('id_pago','=',$id)->orderBy('nrociclo', 'asc')->orderBy('sesion', 'asc')->get();
         return response()->json(['data' => $Ciclos]);
     }
 }
