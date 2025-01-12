@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
    <!-- ========================= CSS here ========================= -->
 
-   <!-- <link rel="stylesheet" href="assets/css/bootstrap.min.css" /> -->
+   <!-- <link rel="stylesheet" href="assets/angular/browser/assets/css/bootstrap.min.css" /> -->
    <link rel="stylesheet" href="assets/angular/browser/assets/css/LineIcons.2.0.css">
    <link rel="stylesheet" href="assets/angular/browser/assets/css/animate.css">
    <link rel="stylesheet" href="assets/angular/browser/assets/css/tiny-slider.css">
@@ -19,7 +19,7 @@
    <link rel="stylesheet" href="assets/angular/browser/assets/css/main.css">
    <link rel="stylesheet" href="assets/angular/browser/assets/css/reset.css">
    <link rel="stylesheet" href="assets/angular/browser/assets/css/responsive.css">
-<style>@charset "UTF-8"</style><link rel="stylesheet" href="/assets/angular/browser/styles-4KER2AW3.css" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="/assets/angular/browser/styles-4KER2AW3.css"></noscript></head>
+<style>@charset "UTF-8"</style><link rel="stylesheet" href="/assets/angular/browser/styles-WTN42UZR.css" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="/assets/angular/browser/styles-WTN42UZR.css"></noscript></head>
 <body>
   <!-- Preloader -->
   <div class="preloader">
@@ -41,8 +41,8 @@
   <script src="assets/angular/browser/assets/js/imagesloaded.min.js"></script>
   <script src="assets/angular/browser/assets/js/isotope.min.js"></script>
   <script src="assets/angular/browser/assets/js/main.js"></script>
-  <!-- <script src="assets/angular/browser/assets/me/javaslcch.min.js"></script> -->
-<link rel="modulepreload" href="/assets/angular/browser/chunk-MDXGIDPX.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-CX5V7JHG.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-JKCGTHXR.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-BYUBF2K6.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-GAL4ENT6.js"><script src="/assets/angular/browser/polyfills-FFHMD2TL.js" type="module"></script><script src="/assets/angular/browser/main-W2T7NQBV.js" type="module"></script></body>
+  <!-- <script src="assets/me/javaslcch.min.js"></script> -->
+<link rel="modulepreload" href="/assets/angular/browser/chunk-Q24XOT4P.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-BQIS6TBQ.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-26P2QBJH.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-QSD7HHIY.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-GAL4ENT6.js"><script src="/assets/angular/browser/polyfills-FFHMD2TL.js" type="module"></script><script src="/assets/angular/browser/main-FCEBULY4.js" type="module"></script></body>
 <!-- REEMPLAZO FOR PRODUCTION -->
  <!-- TODOS LOS "assets" reemplazar por "assets/angular/browser/assets" -->
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>

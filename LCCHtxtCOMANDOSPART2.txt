@@ -62,7 +62,7 @@ paginaClientes: number = 1; // Variable de página actual para la paginación
 
 
 
-  =======EJEMPLO DE PIPE... DEBERA SER standalone false
+  =================EJEMPLO DE PIPE... DEBERA SER standalone false =======================
 
   import { Pipe, PipeTransform } from '@angular/core';
 
@@ -119,10 +119,219 @@ export class PipesModule { }
 
 
 
-////////////////DROP AND DRAG
-npm install --save dropzone
+////////////////DROP AND DRAG ======================================================
+PASO 1: npm install --save dropzone
 
-///////
+PASO 2: PREPARAR EL SERVICIO
+//#region SUBIDA Y BAJADA DE ARCHIVOS DRAG AND DROP
+  DropzoneGestion(iddropzone:string,TamanioMaxMB:number,CantidadArchivo:number,FormatosArchivos:string):Dropzone {
+    Dropzone.autoDiscover = false;
+    // Sobrescribir confirmación para cancelar sin preguntar
+    Dropzone.confirm = function (message, acceptedCallback, rejectedCallback) {
+      if (acceptedCallback) {
+        acceptedCallback();
+      }
+    };
+    const component = this; // Referencia al componente
+    const dropzone = new Dropzone('#'+iddropzone, {
+      url: this.ruta + 'api/uploadFile',
+      maxFilesize: TamanioMaxMB, // Tamaño máximo del archivo en MB
+      maxFiles: CantidadArchivo, // Máximo de 5 archivos
+      acceptedFiles: FormatosArchivos,//'image/jpeg, image/png, application/pdf', // Tipos permitidos
+      addRemoveLinks: true,
+
+      dictDefaultMessage: 'Arrastra tus archivos aquí o haz clic para seleccionar',
+      dictRemoveFile: 'Eliminar archivo',
+      dictCancelUpload: 'Cancelar subida',
+      autoProcessQueue: true,
+      init: function () {
+        this.on('addedfile', function (file) {
+          console.log('Archivo añadido:', file);
+          const progressBar = Dropzone.createElement(
+            `<div class="progress" style="height: 30px; margin-top: 10px;">
+              <div class="progress-bar" role="progressbar" style="width: 0%; background-color: #4caf50;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-bar-inner"></div>
+              </div>
+            </div>
+            <hr>`
+          );
+          file.previewElement.appendChild(progressBar);
+          const previewElement = file.previewElement;
+          if (previewElement) {
+            const successMark = previewElement.querySelector('.dz-success-mark');
+            const errorMark = previewElement.querySelector('.dz-error-mark');
+            const progress = previewElement.querySelector('.dz-progress');
+            const errormessage = previewElement.querySelector('.dz-error-message');
+            if (successMark) successMark.remove();
+            if (errorMark) errorMark.remove();
+            if (progress) progress.remove();
+            if (errormessage) errormessage.remove();
+          }
+        });
+
+        this.on('uploadprogress', function (file, progress) {
+          console.log(`Progreso de subida: ${progress}%`);
+          const progressBar = file.previewElement.querySelector('.progress-bar');
+          if (progressBar) {
+            progressBar.style.width = progress + '%';
+            progressBar.style.backgroundColor = '#00c7f3';
+            progressBar.setAttribute('aria-valuenow', progress);
+          }
+        });
+
+        this.on('sending', function (file, xhr, formData) {
+          console.log('Enviando archivo:', file.name);
+          formData.append('type', sessionStorage.getItem('CategoriaFile'));
+        });
+
+        this.on('success', function (file, response) {
+          console.log('Archivo subido exitosamente:', response);
+          sessionStorage.setItem("IMG",response.filePath)
+          // component. = ''
+          file.serverFilePath = response.filePath;
+          const progressBar = file.previewElement.querySelector('.progress-bar');
+          if (progressBar) {
+            progressBar.style.backgroundColor = '#4caf50'; //color verde
+          }
+          // setTimeout(() => { this.removeAllFiles(true); // Remover todos los archivos de la vista
+          // }, 3000); // Espera 3 segundos antes de remover los archivos
+        });
+
+        this.on('error', function (file) {
+          console.log('Error al subir el archivo:', file);
+          const progressBar = file.previewElement.querySelector('.progress-bar');
+          if (progressBar) {
+            progressBar.style.backgroundColor = '#f44336';
+          }
+          component.MostrarMensaje("error","OCURRIO UN ERROR, SOLO SE PERMITE 1 ARCHIVO")
+        });
+
+        this.on('removedfile', function (file) {
+          console.log("PASANDO POR REMOVEDFILE",file);
+          // if (sessionStorage.getItem("MODOREMOVEDFILE")=='ALLDELETE') {
+          //   //ELIMINANDO TODOS LOS ARCHIVOS
+          //   console.log('ELIMINANDO TODOS LOS ARCHIVOS');
+          //   if (file.serverFilePath) {
+          //     component.EliminarArchivo(file.serverFilePath);
+          //     console.log("ELIMINANDO");
+          //   }
+          // }
+          if (file.serverFilePath) {
+            component.EliminarArchivo(file.serverFilePath);
+            console.log("ELIMINANDO");
+          }
+          sessionStorage.removeItem("IMG")
+          sessionStorage.removeItem("MODOREMOVEDFILE")
+        });
+      },
+    });
+    return dropzone
+  }
+
+
+
+
+  EliminarArchivo(filePath: string): void {
+    this.http.post(this.ruta + 'api/deleteFile', { filePath: filePath }).subscribe(
+      response => {
+        console.log('File deleted successfully:', response);
+      },
+      error => {
+        console.error('Error deleting file:', error);
+      }
+    );
+  }
+  //#endregion DRAG AND DROP
+
+
+PASO 3: EN EL HTML COMPONENT
+    <div id="dropzone" class="dropzone"></div>Ç
+    O
+    <div class="mb-3 col-sm-12">
+      <label class="form-text">Foto</label>
+      <div id="dropzoneclientes" class="dropzone"></div>
+      <hr>
+      <span>IMAGEN ACTUAL:</span>
+      <img [src]="ruta+newClientes.value.foto" alt="" width="50%">
+    </div>
+
+PASO 4 : EN TS COMPONENT
+  import Dropzone from 'dropzone'; // Cambia esta línea para usar una importación por defecto
+  //#region DROPZONE
+  dataDropZone = {
+    iddropzone:'dropzone',
+    tamanioMB:30,
+    cantidadFiles:1,
+    TipoArchivos:'image/jpeg, image/png, application/pdf',
+  };
+
+  crearDropzone(): void {
+    var dropzoneElement = document.getElementById("dropzone");
+
+    if (dropzoneElement && Dropzone.instances.length > 0) {
+        Dropzone.instances.forEach((instance) => {
+            if (instance.element === dropzoneElement) {
+                instance.destroy(); // Elimina la instancia existente
+                dropzoneElement.innerHTML = ''; // Limpia el contenido residual
+            }
+        });
+    }
+    // CREATE DROPZONE
+    this.dropzone = this._tools.DropzoneGestion(this.dataDropZone.iddropzone,this.dataDropZone.tamanioMB,this.dataDropZone.cantidadFiles,
+      this.dataDropZone.TipoArchivos)
+    console.log("drozone creado",this.dropzone);
+
+  }
+  dropzone: Dropzone;
+  CancelarArchivosDropzone(): void {
+    // sessionStorage.removeItem("RESET")
+    sessionStorage.setItem("MODOREMOVEDFILE","ALLDELETE")
+    //SE PROCEDE A ELIMINAR TODOS LOS ARCHIVOS
+    if (this.dropzone) {
+      this.dropzone.removeAllFiles(true); // Remover todos los archivos de la vista
+    }
+  }
+  //#endregion DROPZONE
+
+PASO 5: EN AgregarModificarInicios() DEL TS COMPONENT***********
+ARRIBA DE: if (!id) { //PREGUNTAMOS: SI NO TIENE id?
+
+PONER
+//PARA IMAGENES
+var imgValue:string = sessionStorage.getItem("IMG");
+console.log("VALOR img",imgValue);
+if (imgValue==null || imgValue=='') {//SI ES NULL ENTONCES NO MOVER LA INFORMACION DE ARCHIVO
+}else{// SI TIENE VALORES ENTONCES ACTUALIZAR EL VALOR
+    this.newInicios.value.archivo = imgValue
+}
+if (!id) { //PREGUNTAMOS: SI NO TIENE id?
+
+
+PASO 6: EN EL MODO EDICION DEL TS COMPONENT DE LA MISMA FUNCION DE AGREGARMODIFICAR, ELIMINAR EL ANTERIOR ARCHIVO DEL DATA ANTERIOR***********
+
+//COMO TODO SALIO BIEN ENTONCES PROCEDEMOS A ELIMINAR EL DATA ANTERIOR SI ES Q CAMBIA DE IMAGEN "ARRIBA DEL RESET"
+if (this.newIniciosAnteriorAccion.controls.archivo.value==this.newInicios.controls.archivo.value) {
+    //SON IGUALES ENTONCES NO ELIMINAR FILE
+}else{
+    this._tools.EliminarArchivo(this.newIniciosAnteriorAccion.value.archivo)
+}
+this.reset();
+
+
+PASO 7: NO OLVIDAR ESTE SESSION, ayuda a poner el TYPE**********
+sessionStorage.setItem('CategoriaFile',categoria) //CON ESTO CONTROLO EL VALOR DE CATEGORIA
+
+PASO 8: EN EL RESET DEL CRUD PONER *********
+sessionStorage.removeItem("IMG")
+
+PASO 9: ANTES DEL: this._tools.abrirModal('modalgestionUsuarios') AL SELECCIONAR DEL CRUD Y EN LA FUNCION ABRIRMODAL **********
+this.crearDropzone() //CREARDROPZONE
+this._tools.abrirModal('modalgestionUsuarios')
+
+PASO 10: PONER EN EL HTML COMPONENT LA ACCION ELIMINAR ARCHIVOS EN CASO DE CANCELAR:
+PONER EN EL BOTON CANCELAR Y EN EL BOTON X DE LOS MODAL
+(click)="CancelarArchivosDropzone()"
+///////QUILL EDITOR =========================================================
 PARA QUILL editor de texto
 paso 1: npm install quill@2.0.3
 
@@ -302,3 +511,102 @@ HTML
     <quill-editor class="quill-container-wrapper" [modules]="_tools.modulesQuillEdicion" formControlName="notas"></quill-editor>
 
   //#endregion QUILL EDITOR
+
+
+
+
+//-----------------------------MODALS OPENS CERRAR, CERRAR TODOS
+
+
+PASO 1: EN EL SERVICIO
+//#region COSAS DE BOOSTRAP
+  //MODALS
+  private modales: { [id: string]: Modal } = {};
+  abrirModal(modalId: string): void {
+    const modalElement = document.getElementById(modalId);
+    if (modalElement) {
+      if (!this.modales[modalId]) {
+        this.modales[modalId] = new Modal(modalElement);
+      }
+      this.modales[modalId].show();
+    } else {
+      console.error(`No se encontró un modal con el ID "${modalId}"`);
+    }
+  }
+
+  cerrarModales(): void {
+    Object.keys(this.modales).forEach((id) => {
+      this.modales[id].hide();
+      delete this.modales[id];
+    });
+  }
+
+  cerrarModal(modalId: string): void {
+    // const modal = document.getElementById(modalId); if (modal) { modal.style.display = 'none'; }
+    var cerrado = false
+    if (this.modales[modalId]) {
+      this.modales[modalId].hide();
+      cerrado=true
+    }
+
+    const modalElement = document.getElementById(modalId);
+    if (modalElement && cerrado == false) {
+      console.warn(`No se encontró un modal con el ID "${modalId}" en la colección 'modales'. Intentando cerrarlo desde el DOM...`);
+        // Intentar cerrar el modal utilizando una referencia al elemento del DOM
+        const modalInstance = Modal.getInstance(modalElement);
+        if (modalInstance) {
+            modalInstance.hide();
+            console.log(`Modal con ID "${modalId}" cerrado utilizando instancia de Bootstrap.`);
+        } else {
+            console.error(`No se pudo obtener la instancia de Bootstrap para el modal con ID "${modalId}".`);
+        }
+
+        // Asegurarse de eliminar el backdrop del DOM
+        const backdropElements = document.getElementsByClassName('modal-backdrop');
+        if (backdropElements.length > 0) {
+            // Eliminar todos los elementos de backdrop
+            for (let i = backdropElements.length - 1; i >= 0; i--) {
+                backdropElements[i].parentNode.removeChild(backdropElements[i]);
+            }
+            console.log(`Backdrop eliminado para el modal con ID "${modalId}".`);
+        }
+    } else {
+        console.error(`No se encontró un modal con el ID "${modalId}" en el DOM.`);
+    }
+  }
+
+
+  //#endregion COSAS DE BOOSTRAP
+
+  PASO 2: EN LOS TS COMPONENT LIMPIAR LOS MODALS PONIENDO:
+  ngOnDestroy(): void {
+    this._tools.cerrarModales();
+  }
+
+
+
+
+
+////////////////////////////IMPORTANTE AL SUBIR AL HOSTING PARA LOS ARCHIVOS////////////////////////////////
+PARA EVITAR EL PROBLEMA DE LOS ARCHIVOS EN EL HOSTING:
+
+PASO 1: IR A el archivo que hay q modificar en el hosting esta en esta direccion \vendor\laravel\framework\src\Illuminate\Foundation\helpers.php
+
+mirar esta cosa importante para los archivos sobre el PUBLIC_HTML
+ESTO SE PUSO EN:
+return app()->make('path.public').($path ? DIRECTORY_SEPARATOR.ltrim($path, DIRECTORY_SEPARATOR) :$path);
+
+SE PUSO ACA EN EL HELPERS.PHP
+if (! function_exists('public_path')) {
+    /**
+     * Get the path to the public folder.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    function public_path($path = '')
+    {
+        //return app()->publicPath($path); //SE COMENTO ESTO(QUITA ESTE COMENTARIO)
+        return app()->make('path.public').($path ? DIRECTORY_SEPARATOR.ltrim($path, DIRECTORY_SEPARATOR) :$path); //ORIGINAL QUE HACE FUNCIONAR
+    }
+}
