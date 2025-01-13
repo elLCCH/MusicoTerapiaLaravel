@@ -6,6 +6,7 @@ use App\Models\Cliente;
 use Illuminate\Http\Request;
 use App\Http\Middleware\UpdateTokenExpiration;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Hash;
 
 class ClienteController extends Controller
 {
@@ -23,6 +24,7 @@ class ClienteController extends Controller
     public function store(Request $request)
     {
         $Cliente = $request->all();
+        $Cliente['contrasenia']= Hash::make($request->input('contrasenia')) ;
         Cliente::insert($Cliente);
         return response()->json(['data' => $Cliente]);
     }
@@ -37,6 +39,17 @@ class ClienteController extends Controller
     public function update(Request $request)
     {
         $Cliente = $request->all();
+        //SINO SE ENVIO EL PARAMETRO contrasenia hacer
+        if ($request->has('contrasenia')) {
+            //SI SE ENVIO
+            //SI NO ES TIPO HASH CREAR NUEVO HASH
+            if (Hash::needsRehash($request->contrasenia))
+            {
+                $Cliente['contrasenia'] = Hash::make($request->contrasenia);
+            }
+        } else {
+            //NO SE ENVIO
+        }
         Cliente::where('id','=',$request->id)->update($Cliente);
         return response()->json(['data' => $Cliente]);
     }
