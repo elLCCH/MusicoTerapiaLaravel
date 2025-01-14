@@ -590,7 +590,8 @@ PASO 1: EN EL SERVICIO
 ////////////////////////////IMPORTANTE AL SUBIR AL HOSTING PARA LOS ARCHIVOS////////////////////////////////
 PARA EVITAR EL PROBLEMA DE LOS ARCHIVOS EN EL HOSTING:
 
-PASO 1: IR A el archivo que hay q modificar en el hosting esta en esta direccion \vendor\laravel\framework\src\Illuminate\Foundation\helpers.php
+PASO 1: IR A el archivo que hay q modificar en el hosting esta
+en esta direccion \vendor\laravel\framework\src\Illuminate\Foundation\helpers.php
 
 mirar esta cosa importante para los archivos sobre el PUBLIC_HTML
 ESTO SE PUSO EN:
