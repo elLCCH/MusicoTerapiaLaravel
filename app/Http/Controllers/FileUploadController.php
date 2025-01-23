@@ -30,6 +30,9 @@ class FileUploadController extends Controller
             case 'USUARIO':
                 $path = 'ArchivosCrud/UsuariosFiles';
                 break;
+            case 'SERVICIO':
+                $path = 'ArchivosCrud/ServiciosFiles';
+                break;
             default:
                 return response()->json(['error' => 'Tipo de archivo no válido'], 400);
         }
