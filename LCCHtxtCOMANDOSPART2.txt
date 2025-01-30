@@ -611,3 +611,37 @@ if (! function_exists('public_path')) {
         return app()->make('path.public').($path ? DIRECTORY_SEPARATOR.ltrim($path, DIRECTORY_SEPARATOR) :$path); //ORIGINAL QUE HACE FUNCIONAR
     }
 }
+
+
+
+===========================CRONS EN LARAVEL CON CPANEL=========================
+
+paso 1:DIRECTAMENTE EN EL routes/console.php
+
+use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+Artisan::command('tareas-estudiantes', function () {
+    //ACTUALIZAR EDADES DE LOS ESTUDIANTES
+    DB::select("UPDATE estudiantes e set e.Edad= TIMESTAMPDIFF(YEAR,e.FechNac,CURDATE())");
+    $texto = "[".date("Y-m-d H:i:s")."]:SE ACTUALIZARON LAS EDADES";
+    Storage::append("archivo.txt",$texto);
+    //$this->info('La tarea se ejecutó correctamente.');
+})->purpose('Display an inspiring quote')->everyMinute();
+
+
+
+en cpanel coincidir en el codigo cron la version de php
+/usr/local/bin/ea-php82 /home/pcbafcze/laravel1/artisan tareas-estudiantes >> /home/pcbafcze/cron.log 2>&1
+
+
+CORRECCIONES si no da:
+en el .env adicionar
+
+CACHE_STORE=database
+CACHE_PREFIX=
+
+otro:  cambiar config/cache.php
+'default' => env('CACHE_STORE', 'database'),
+por
+'default' => env('CACHE_STORE', 'file'),

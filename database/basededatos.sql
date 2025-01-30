@@ -21,7 +21,7 @@ CREATE OR REPLACE TABLE clientes (
     usuario VARCHAR(50) NULL,
     contrasenia VARCHAR(500) NULL,
     celular INT NULL,
-    edad INT NULL,
+    edad VARCHAR(20) NULL,
     fechnac DATE NULL,
     carnet VARCHAR(50) NULL,
     foto VARCHAR(500) NULL,
@@ -63,6 +63,7 @@ CREATE OR REPLACE TABLE pagos (
     horario VARCHAR(100) NULL,
     tipo VARCHAR(80) NULL,
     descuento VARCHAR(100) NULL,
+    fecha DATE NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (id_infocliente) REFERENCES infoclientes(id) ON UPDATE CASCADE ON DELETE CASCADE

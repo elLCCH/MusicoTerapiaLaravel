@@ -18,7 +18,8 @@ class Pago extends Model
         'pagado',
         'horario',
         'tipo',
-        'descuento'
+        'descuento',
+        'fecha'
     ];
 
     //LOGRAR MULTI ARRAY //REUNIR ACA
