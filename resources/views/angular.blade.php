@@ -43,7 +43,7 @@
   <script src="assets/angular/browser/assets/js/isotope.min.js"></script>
   <script src="assets/angular/browser/assets/js/main.js"></script>
   <!-- <script src="assets/me/javaslcch.min.js"></script> -->
-<link rel="modulepreload" href="/assets/angular/browser/chunk-SM37EFEN.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-JNRJELFD.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-CRGVUGVA.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-Q7BX5HDX.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-GAL4ENT6.js"><script src="/assets/angular/browser/polyfills-FFHMD2TL.js" type="module"></script><script src="/assets/angular/browser/main-2JNC4HY7.js" type="module"></script></body>
+<link rel="modulepreload" href="/assets/angular/browser/chunk-6CCIUFDC.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-JNRJELFD.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-CRGVUGVA.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-Q7BX5HDX.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-GAL4ENT6.js"><script src="/assets/angular/browser/polyfills-FFHMD2TL.js" type="module"></script><script src="/assets/angular/browser/main-R72DXDQW.js" type="module"></script></body>
 
 <!-- REEMPLAZO FOR PRODUCTION -->
  <!-- TODOS LOS "assets" reemplazar por "assets/angular/browser/assets" -->
