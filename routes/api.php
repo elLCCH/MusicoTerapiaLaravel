@@ -67,6 +67,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 //SOLO SUPER ADMINISTRADOR
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::middleware([CheckAbilities::class . ':superadmin'])->group(function () {
+
         //ARCHIVOS PAGOS
         Route::resource('ArchivosPagos', 'App\Http\Controllers\ArchivosPagoController');
         Route::get('AllInfoArchivosPagos/{id}', 'App\Http\Controllers\ArchivosPagoController@AllInfoArchivosPagos')->middleware([CheckAbilities::class . ':show-cliente']);
@@ -95,6 +96,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('eliminarsubplandeintervencionsxdata','App\Http\Controllers\SubPlandeIntervencionController@eliminarsubplandeintervencionsxdata')->middleware([CheckAbilities::class . ':show-cliente']);
 
         Route::resource('Usuarios', 'App\Http\Controllers\UsuarioController');
+        //DEMUCAS
+        Route::resource('Demucas', 'App\Http\Controllers\DemucasController');
+        Route::get('AllDemucas/{id}', 'App\Http\Controllers\DemucasController@AllDemucas')->middleware([CheckAbilities::class . ':show-cliente']);
+        Route::post('AddGrupoDemucas', 'App\Http\Controllers\DemucasController@AddGrupoDemucas')->middleware([CheckAbilities::class . ':show-cliente']);
+        Route::post('DeleteGrupoDemucas', 'App\Http\Controllers\DemucasController@DeleteGrupoDemucas')->middleware([CheckAbilities::class . ':show-cliente']);
+
     });
 });
 

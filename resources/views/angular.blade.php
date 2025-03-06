@@ -12,7 +12,7 @@
    <!-- ========================= CSS here ========================= -->
 
 
-   <!-- <link rel="stylesheet" href="assets/angular/browser/assets/css/bootstrap.min.css" /> -->
+   <!-- <link rel="stylesheet" href="assets/css/bootstrap.min.css" /> -->
    <link rel="stylesheet" href="assets/angular/browser/assets/css/LineIcons.2.0.css">
    <link rel="stylesheet" href="assets/angular/browser/assets/css/animate.css">
    <link rel="stylesheet" href="assets/angular/browser/assets/css/tiny-slider.css">
@@ -42,12 +42,12 @@
   <script src="assets/angular/browser/assets/js/imagesloaded.min.js"></script>
   <script src="assets/angular/browser/assets/js/isotope.min.js"></script>
   <script src="assets/angular/browser/assets/js/main.js"></script>
-  <!-- <script src="assets/angular/browser/assets/me/javaslcch.min.js"></script> -->
-<link rel="modulepreload" href="/assets/angular/browser/chunk-N245ANOW.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-CC25JQM6.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-MARK3M4R.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-SJB33XGV.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-GAL4ENT6.js"><script src="/assets/angular/browser/polyfills-FFHMD2TL.js" type="module"></script><script src="/assets/angular/browser/main-P7QBRGOP.js" type="module"></script></body>
+  <!-- <script src="assets/me/javaslcch.min.js"></script> -->
+<link rel="modulepreload" href="/assets/angular/browser/chunk-UWQ46BU2.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-CC25JQM6.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-MARK3M4R.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-SJB33XGV.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-GAL4ENT6.js"><script src="/assets/angular/browser/polyfills-FFHMD2TL.js" type="module"></script><script src="/assets/angular/browser/main-RTBOFHAA.js" type="module"></script></body>
 
 <!-- REEMPLAZO FOR PRODUCTION -->
  <!-- TODOS LOS "assets" reemplazar por "assets/angular/browser/assets" -->
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script>
+<!-- <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script> -->
+<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js" integrity="sha384-cuYeSxntonz0PPNlHhBs68uyIAVpIIOZZ5JqeqvYYIcEL727kskC66kF92t6Xl2V" crossorigin="anonymous"></script> -->
 
 </html>

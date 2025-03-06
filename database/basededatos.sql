@@ -93,6 +93,8 @@ CREATE OR REPLACE TABLE ciclos (
     estadopago VARCHAR(30) NULL,
     eri VARCHAR(60) NULL,
     cim VARCHAR(60) NULL,
+    ejecucion TEXT NULL,
+    apuntes TEXT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (id_pago) REFERENCES pagos(id) ON UPDATE CASCADE ON DELETE CASCADE
@@ -124,16 +126,17 @@ CREATE OR REPLACE TABLE subplandeintervencions (
 );
 
 
-CREATE OR REPLACE TABLE plandeintervencionsciclos (
+CREATE OR REPLACE TABLE demucas (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    id_plandeintervencion INT NOT NULL,
-    id_ciclo INT NOT NULL,
-    ejecucion TEXT NULL,
-    apuntes TEXT NULL,
+    id_infocliente INT NOT NULL,
+    evaluacion VARCHAR(30) NULL,
+    rango INT NULL,
+    palabra VARCHAR(50) NULL,
+    escala VARCHAR(10) NULL,
+    fecha DATE NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (id_plandeintervencion) REFERENCES plandeintervencions(id) ON UPDATE CASCADE ON DELETE CASCADE,
-    FOREIGN KEY (id_ciclo) REFERENCES ciclos(id) ON UPDATE CASCADE ON DELETE CASCADE
+    FOREIGN KEY (id_infocliente) REFERENCES infoclientes(id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
 CREATE OR REPLACE TABLE matrizescalas (

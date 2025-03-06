@@ -19,7 +19,9 @@ class Ciclo extends Model
         'fecha',
         'estadopago',
         'eri',
-        'cim'
+        'cim',
+        'ejecucion',
+        'apuntes',
     ];
     //LOGRAR MULTI ARRAY //USAR PARA INCORPORACION
     public function pago() {

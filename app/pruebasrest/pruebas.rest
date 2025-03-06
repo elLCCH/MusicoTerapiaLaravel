@@ -21,10 +21,10 @@ Accept: application/json
 }
 
 ### Perfil
-GET http://127.0.0.1:8000/api/Clientes
+GET http://127.0.0.1:8000/api/Demucas
 Content-Type: application/json
 Accept: application/json
-Authorization: Bearer 15|CBOWkc1xffg7HCUCjdSHWuB1JSvUOLI40yRSrzbwdbd8caa6
+Authorization: Bearer 81|HjIFpqiPDZd5EcvPVLnFZCjGbi1SrjmWmhexQXet6588d9b4
 
 ### Logout
 POST http://127.0.0.1:8000/api/v1/auth/logout
