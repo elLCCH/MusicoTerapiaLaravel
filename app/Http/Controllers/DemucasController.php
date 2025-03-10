@@ -50,7 +50,7 @@ class DemucasController extends Controller
     }
     //#endregion Fin Controller de Crud PHP de Demucas
     public function AllDemucas($id) {
-        $InfoCliente = Demucas::where('id_infocliente','=',$id)->orderBy('evaluacion', 'asc')->orderBy('rango', 'asc')->get();
+        $InfoCliente = Demucas::where('id_infocliente','=',$id)->orderBy('evaluacion', 'asc')->orderBy('categoria', 'asc')->orderBy('rango', 'asc')->get();
         return response()->json(['data' => $InfoCliente]);
     }
 
@@ -68,5 +68,10 @@ class DemucasController extends Controller
         $ids = $request->all();
         Demucas::whereIn('id', $ids)->delete();
         return response()->json(['data' => 'ELIMINADO EXITOSAMENTE']);
+    }
+    public function ModificarEscalaDemucas($id, Request $request) {
+        $escala = $request->input('escala');
+        Demucas::where('id', '=', $id)->update(['escala' => $escala]);
+        return response()->json(['data' => 'Escala actualizada exitosamente']);
     }
 }

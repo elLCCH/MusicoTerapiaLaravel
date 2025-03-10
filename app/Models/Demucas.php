@@ -13,6 +13,7 @@ class Demucas extends Model
     // Lista de atributos asignables
     protected $fillable = [
         'id_infocliente',
+        'categoria',
         'evaluacion',
         'rango',
         'palabra',

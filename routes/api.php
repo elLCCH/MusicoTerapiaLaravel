@@ -101,7 +101,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('AllDemucas/{id}', 'App\Http\Controllers\DemucasController@AllDemucas')->middleware([CheckAbilities::class . ':show-cliente']);
         Route::post('AddGrupoDemucas', 'App\Http\Controllers\DemucasController@AddGrupoDemucas')->middleware([CheckAbilities::class . ':show-cliente']);
         Route::post('DeleteGrupoDemucas', 'App\Http\Controllers\DemucasController@DeleteGrupoDemucas')->middleware([CheckAbilities::class . ':show-cliente']);
-
+        Route::put('ModificarEscalaDemucas/{id}', 'App\Http\Controllers\DemucasController@ModificarEscalaDemucas')->middleware([CheckAbilities::class . ':show-cliente']);
     });
 });
 

@@ -14,7 +14,8 @@ class MatrizEscala extends Model
     protected $fillable = [
         'categoria',
         'nombrematriz',
-        'valor'
+        'valor',
+        'multiplicar'
     ];
     //LOGRAR MULTI ARRAY //REUNIR ACA
     public function submatrizescala() {

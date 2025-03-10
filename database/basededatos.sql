@@ -129,6 +129,7 @@ CREATE OR REPLACE TABLE subplandeintervencions (
 CREATE OR REPLACE TABLE demucas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     id_infocliente INT NOT NULL,
+    categoria VARCHAR(60) NULL,
     evaluacion VARCHAR(30) NULL,
     rango INT NULL,
     palabra VARCHAR(50) NULL,
@@ -144,6 +145,7 @@ CREATE OR REPLACE TABLE matrizescalas (
     categoria VARCHAR(60) NULL,
     nombrematriz VARCHAR(60) NULL,
     valor VARCHAR(15) NULL,
+    multiplicar INT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
