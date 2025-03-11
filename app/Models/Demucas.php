@@ -18,6 +18,7 @@ class Demucas extends Model
         'rango',
         'palabra',
         'escala',
+        'multiplicar',
         'fecha'
     ];
 }
