@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es" data-critters-container>
+<html lang="es" data-beasties-container>
 <head>
   <meta charset="utf-8">
   <title>MusicoTerapia</title>
@@ -12,7 +12,7 @@
    <!-- ========================= CSS here ========================= -->
 
 
-   <!-- <link rel="stylesheet" href="assets/css/bootstrap.min.css" /> -->
+   <!-- <link rel="stylesheet" href="assets/angular/browser/assets/css/bootstrap.min.css" /> -->
    <link rel="stylesheet" href="assets/angular/browser/assets/css/LineIcons.2.0.css">
    <link rel="stylesheet" href="assets/angular/browser/assets/css/animate.css">
    <link rel="stylesheet" href="assets/angular/browser/assets/css/tiny-slider.css">
@@ -20,7 +20,7 @@
    <link rel="stylesheet" href="assets/angular/browser/assets/css/main.css">
    <link rel="stylesheet" href="assets/angular/browser/assets/css/reset.css">
    <link rel="stylesheet" href="assets/angular/browser/assets/css/responsive.css">
-<style>@charset "UTF-8"</style><link rel="stylesheet" href="/assets/angular/browser/styles-DLAM572X.css" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="/assets/angular/browser/styles-DLAM572X.css"></noscript></head>
+<link rel="stylesheet" href="/assets/angular/browser/styles-DLAM572X.css" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="/assets/angular/browser/styles-DLAM572X.css"></noscript></head>
 <body>
   <!-- Preloader -->
   <div class="preloader">
@@ -42,8 +42,8 @@
   <script src="assets/angular/browser/assets/js/imagesloaded.min.js"></script>
   <script src="assets/angular/browser/assets/js/isotope.min.js"></script>
   <script src="assets/angular/browser/assets/js/main.js"></script>
-  <!-- <script src="assets/me/javaslcch.min.js"></script> -->
-<link rel="modulepreload" href="/assets/angular/browser/chunk-25TX63JK.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-W5BCXXFE.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-FD67Y65K.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-KSG7VVO3.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-GAL4ENT6.js"><script src="/assets/angular/browser/polyfills-FFHMD2TL.js" type="module"></script><script src="/assets/angular/browser/main-BGE4KL5F.js" type="module"></script></body>
+  <!-- <script src="assets/angular/browser/assets/me/javaslcch.min.js"></script> -->
+<link rel="modulepreload" href="/assets/angular/browser/chunk-WDKJVXIE.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-I5325WT2.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-JNIIKDFF.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-6HLOB24Q.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-GAL4ENT6.js"><script src="/assets/angular/browser/polyfills-FFHMD2TL.js" type="module"></script><script src="/assets/angular/browser/main-YVCLRDZW.js" type="module"></script></body>
 
 <!-- REEMPLAZO FOR PRODUCTION -->
  <!-- TODOS LOS "assets" reemplazar por "assets/angular/browser/assets" -->

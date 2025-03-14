@@ -1,0 +1,2 @@
+npm install --save docx
+npm install file-saver @types/file-saver --save

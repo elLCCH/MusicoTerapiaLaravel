@@ -1,0 +1,51 @@
+npm install ng-apexcharts --save
+ejecutar: npm list ng-apexcharts   //para verificar que este instalado correctamente
+
+
+luego importar al modulo:
+import { NgApexchartsModule } from 'ng-apexcharts'; // Importa el módulo
+
+NgApexchartsModule //poner en imports
+
+=============================================================
+
+ejemplo 1:
+chartOptions: any;
+this.chartOptions = {
+      series: [
+        {
+          name: 'Ventas',
+          data: [30, 40, 35, 50, 49, 60, 70, 91, 125],
+        },
+      ],
+      chart: {
+        height: 350,
+        type: 'line', // Tipo de gráfica (línea en este caso)
+      },
+      title: {
+        text: 'Ventas Mensuales', // Título de la gráfica
+      },
+      xaxis: {
+        categories: [
+          'Ene',
+          'Feb',
+          'Mar',
+          'Abr',
+          'May',
+          'Jun',
+          'Jul',
+          'Ago',
+          'Sep',
+        ], // Categorías del eje X
+      },
+    };
+
+    HTML
+<div id="chart">
+  <apx-chart
+    [series]="chartOptions.series"
+    [chart]="chartOptions.chart"
+    [xaxis]="chartOptions.xaxis"
+    [title]="chartOptions.title"
+  ></apx-chart>
+</div>

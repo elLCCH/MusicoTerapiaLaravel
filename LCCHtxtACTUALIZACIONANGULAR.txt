@@ -1,0 +1,4 @@
+PASO 1: INSTLAR VERSION MAS RECIENTE DE NODE JS
+PASO 2: npm install -g @angular/cli@latest
+PASO 3: ng update @angular/core @angular/cli
+PASO 4 (NO OBLIGATORIO): ng update @angular/material

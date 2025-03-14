@@ -7,7 +7,30 @@
   </button>
 </div>
 
+===================LOGRAR LOS CLICK DEL RATON===================
+(mousedown)="CargarGraficas($event)" //HTML
 
+TS
+(event: MouseEvent)
+
+if (event.button === 2 || event.button === 1) {
+          event.preventDefault();
+        }
+        switch (event.button) {
+          case 0:
+            console.log('Clic izquierdo');
+            this.router.navigate(['/me/graficas']);
+            break;
+          case 1:
+            console.log('Clic de la rueda');
+            window.open('/me/graficas', '_blank');
+            break;
+          case 2:
+            console.log('Clic derecho');
+            break;
+          default:
+            console.log('Otro tipo de clic');
+        }
 
 ===============PARA CREAR FORM GROUPS==============
 
