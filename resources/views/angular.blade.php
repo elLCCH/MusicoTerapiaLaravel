@@ -43,7 +43,7 @@
   <script src="assets/angular/browser/assets/js/isotope.min.js"></script>
   <script src="assets/angular/browser/assets/js/main.js"></script>
   <!-- <script src="assets/angular/browser/assets/me/javaslcch.min.js"></script> -->
-<link rel="modulepreload" href="/assets/angular/browser/chunk-L7PVAAX3.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-3QWAK6LI.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-TKHKG7ZE.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-456DMZIU.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-GAL4ENT6.js"><script src="/assets/angular/browser/polyfills-FFHMD2TL.js" type="module"></script><script src="/assets/angular/browser/main-MFDV3ZLL.js" type="module"></script></body>
+<link rel="modulepreload" href="/assets/angular/browser/chunk-IYLKRXEX.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-7VOUYD7O.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-YXMHNPCV.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-QTYTZ526.js"><link rel="modulepreload" href="/assets/angular/browser/chunk-GAL4ENT6.js"><script src="/assets/angular/browser/polyfills-SCHOHYNV.js" type="module"></script><script src="/assets/angular/browser/main-ELVMLLXI.js" type="module"></script></body>
 
 <!-- REEMPLAZO FOR PRODUCTION -->
  <!-- TODOS LOS "assets" reemplazar por "assets/angular/browser/assets" -->
