@@ -74,4 +74,20 @@ class PagoController extends Controller
     }
     //#endregion Fin Controller de Crud PHP de Pago
 
+    public function AllPagosidCliente($id) {
+        $Pago = Pago::with(['ciclos' => function ($query) {
+            $query->orderBy('sesion', 'asc');
+        }])
+        ->join('infoclientes', 'pagos.id_infocliente', '=', 'infoclientes.id')
+        ->join('clientes', 'infoclientes.id_cliente', '=', 'clientes.id')
+        ->addSelect('pagos.*', 'clientes.nombres', 'clientes.apellidos', 'clientes.celular', 'clientes.carnet', 'clientes.estado', 'infoclientes.fechaadmision')
+        ->where('clientes.id', '=', $id)
+        ->orderBy('clientes.estado', 'asc')
+        ->orderBy('clientes.apellidos', 'asc')
+        ->orderBy('clientes.nombres', 'asc')
+        ->orderBy('infoclientes.fechaadmision', 'desc')
+        ->orderBy('pagos.id', 'desc')
+        ->get();
+        return response()->json(['data' => $Pago]);
+    }
 }

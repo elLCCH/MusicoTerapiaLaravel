@@ -40,18 +40,22 @@ class UsuarioController extends Controller
     public function update(Request $request)
     {
         $Usuario = $request->all();
-        //SINO SE ENVIO EL PARAMETRO contrasenia hacer
+
+        // Si se envió el parámetro 'contrasenia'
         if ($request->has('contrasenia')) {
-            //SI SE ENVIO
-            //SI NO ES TIPO HASH CREAR NUEVO HASH
-            if (Hash::needsRehash($request->contrasenia))
-            {
-                $Usuario['contrasenia'] = Hash::make($request->contrasenia);
+            $contrasenia = $request->input('contrasenia');
+            // Si la contraseña no está hasheada, la hasheamos
+            if (!Hash::info($contrasenia)['algo'] || Hash::needsRehash($contrasenia)) {
+                $Usuario['contrasenia'] = Hash::make($contrasenia);
+            } else {
+                $Usuario['contrasenia'] = $contrasenia;
             }
         } else {
-            //NO SE ENVIO
+            // Si no se envió, eliminamos del array para no sobrescribir
+            unset($Usuario['contrasenia']);
         }
-        Usuario::where('id','=',$request->id)->update($Usuario);
+
+        Usuario::where('id', '=', $request->id)->update($Usuario);
         return response()->json(['data' => $Usuario]);
     }
 
