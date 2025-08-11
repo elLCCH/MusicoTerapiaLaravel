@@ -166,6 +166,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         //PAGOS
         Route::resource('Pagos', 'App\Http\Controllers\PagoController');
         Route::get('AllPagosidCliente/{id}', 'App\Http\Controllers\PagoController@AllPagosidCliente');
+        Route::get('AllPagosidinfoCliente/{id}', 'App\Http\Controllers\PagoController@AllPagosidinfoCliente');
 
         Route::resource('PlandeIntervencionsCiclos', 'App\Http\Controllers\PlandeIntervencionsCiclosController');
         //SUB MATRIZ ESCALAS

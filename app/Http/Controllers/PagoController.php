@@ -90,4 +90,22 @@ class PagoController extends Controller
         ->get();
         return response()->json(['data' => $Pago]);
     }
+
+
+    public function AllPagosidinfoCliente($idinfocliente) {
+        $Pago = Pago::with(['ciclos' => function ($query) {
+            $query->orderBy('sesion', 'asc');
+        }])
+        ->join('infoclientes', 'pagos.id_infocliente', '=', 'infoclientes.id')
+        ->join('clientes', 'infoclientes.id_cliente', '=', 'clientes.id')
+        ->addSelect('pagos.*', 'clientes.nombres', 'clientes.apellidos', 'clientes.celular', 'clientes.carnet', 'clientes.estado', 'infoclientes.fechaadmision')
+        ->where('infoclientes.id', '=', $idinfocliente)
+        ->orderBy('clientes.estado', 'asc')
+        ->orderBy('clientes.apellidos', 'asc')
+        ->orderBy('clientes.nombres', 'asc')
+        ->orderBy('infoclientes.fechaadmision', 'desc')
+        ->orderBy('pagos.id', 'desc')
+        ->get();
+        return response()->json(['data' => $Pago]);
+    }
 }
