@@ -8,7 +8,7 @@ use App\Http\Controllers\FileUploadController;
 
 
 
-//CODIGO PARA LA PAGINA DE BLOG
+#region CODIGO PARA LA PAGINA DE BLOG
 // Ruta para OBTENER el HTML
 Route::get('paginablog', function () {
     $path = public_path('editables/paginablog.html');
@@ -31,16 +31,14 @@ Route::post('paginablog', function (Request $request) {
     
     return response()->json(['success' => true, 'message' => 'Blog actualizado correctamente.']);
 });
-//HASTA ACA DEL BLOG
+#endregion HASTA ACA DEL BLOG
 
 
 
-
+#region AUTENTICACION
 Route::prefix("v1/auth")->group(function(){ //el prefijo vi/auth funciona como el routing de angular: v1/auth/login
     Route::post('/login', [AuthController::class, "login"]); //EJECUTAR LA FUNCION login desde el authcontroller
     Route::post('/logout', [AuthController::class, 'logout']); //v1/auth/logout
-    
-
     // Route::post('/register', [AuthController::class, 'register']); //v1/auth/register
     // Route::post('/reset-password', [AuthController::class, 'resetPassword']); //v1/auth/reset-password
     // Route::post('/change-password', [AuthController::class, 'changePassword']); //v1/auth/change-password
@@ -51,6 +49,8 @@ Route::prefix("v1/auth")->group(function(){ //el prefijo vi/auth funciona como e
     Route::post('/cambiar-clave', [AuthController::class, 'cambiarClave'])->middleware('auth:sanctum'); //cambiar clave de usuario ESTO SUELE SER PARA PERMITIR EL AUTORIZADO
     Route::get('/user', [AuthController::class, 'getUser'])->middleware('auth:sanctum'); //v1/auth/user
 });
+#endregion AUTENTICACION
+
 // Route::middleware("auth:sanctum")->group(function(){
 //     Route::resource('Clientes', ClienteController::class);
 // });
@@ -78,122 +78,180 @@ Route::prefix("v1/auth")->group(function(){ //el prefijo vi/auth funciona como e
 //     });
 // });
 
-//PARA VERIFICAR TOKENS //SIRVE PARA LOS GUARD O SABER name DEL TOKEN DB// TAMBIEN SI YA ESTA EXPIRADO
+#region PARA VERIFICAR TOKENS y ARCHIVOS FILES //SIRVE PARA LOS GUARD O SABER name DEL TOKEN DB// TAMBIEN SI YA ESTA EXPIRADO
 use App\Http\Controllers\TokenController;
 Route::post('/verify-token', [TokenController::class, 'verify']);
 
 Route::post('/uploadFile', [FileUploadController::class, 'uploadFile']);
 Route::post('/deleteFile', [FileUploadController::class, 'deleteFile']);
+#endregion PARA VERIFICAR TOKENS
 
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\InicioController;
 
-Route::middleware(['auth:sanctum'])->group(function () {
-    Route::get('/Clientes', [ClienteController::class, 'index'])->middleware([CheckAbilities::class . ':view-cliente']);
-    Route::get('/Clientes/{id}', [ClienteController::class, 'show'])->middleware([CheckAbilities::class . ':show-cliente']);
-    Route::post('/Clientes', [ClienteController::class, 'store'])->middleware([CheckAbilities::class . ':create-cliente']);
-    Route::put('/Clientes/{id}', [ClienteController::class, 'update'])->middleware([CheckAbilities::class . ':update-cliente']);
-    Route::delete('/Clientes/{id}', [ClienteController::class, 'destroy'])->middleware([CheckAbilities::class . ':delete-cliente']);
-});
+// Route::middleware(['auth:sanctum'])->group(function () {
+//     Route::get('/Clientes', [ClienteController::class, 'index'])->middleware([CheckAbilities::class . ':MUSICOTERAPEUTA']);
+//     Route::get('/Clientes/{id}', [ClienteController::class, 'show'])->middleware([CheckAbilities::class . ':show-cliente']);
+//     Route::post('/Clientes', [ClienteController::class, 'store'])->middleware([CheckAbilities::class . ':create-cliente']);
+//     Route::put('/Clientes/{id}', [ClienteController::class, 'update'])->middleware([CheckAbilities::class . ':update-cliente']);
+//     Route::delete('/Clientes/{id}', [ClienteController::class, 'destroy'])->middleware([CheckAbilities::class . ':delete-cliente']);
+// });
 
-//INICIOS CONTROLLER
+#region RUTAS PUBLICAS 
+//INICIOS CONTROLLER (PUBLICO)
 Route::get('/Inicios', [InicioController::class, 'index']);
+
+//USUARIOS CONTROLLER (PUBLICO)
+Route::get('CargarUsuariosPublico', 'App\Http\Controllers\UsuarioController@CargarUsuariosPublico');
+#endregion RUTAS PUBLICAS
+
+#region SUPERADMINISTRADOR 
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::get('/Inicios/{id}', [InicioController::class, 'show'])->middleware([CheckAbilities::class . ':show-cliente']);
-    Route::post('/Inicios', [InicioController::class, 'store'])->middleware([CheckAbilities::class . ':create-cliente']);
-    Route::put('/Inicios/{id}', [InicioController::class, 'update'])->middleware([CheckAbilities::class . ':update-cliente']);
-    Route::delete('/Inicios/{id}', [InicioController::class, 'destroy'])->middleware([CheckAbilities::class . ':delete-cliente']);
+    //INICIOS
+    Route::get('/Inicios/{id}', [InicioController::class, 'show'])->middleware([CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)']);
+    Route::post('/Inicios', [InicioController::class, 'store'])->middleware([CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)']);
+    Route::put('/Inicios/{id}', [InicioController::class, 'update'])->middleware([CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)']);
+    Route::delete('/Inicios/{id}', [InicioController::class, 'destroy'])->middleware([CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)']);
+
+    // ARCHIVOS ARCHIVOSPAGOS
+    Route::get('ArchivosPagos', 'App\Http\Controllers\ArchivosPagoController@index')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,CLIENTELA');
+    Route::post('ArchivosPagos', 'App\Http\Controllers\ArchivosPagoController@store')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+    Route::get('ArchivosPagos/{id}', 'App\Http\Controllers\ArchivosPagoController@show')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,CLIENTELA');
+    Route::put('ArchivosPagos/{id}', 'App\Http\Controllers\ArchivosPagoController@update')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+    Route::delete('ArchivosPagos/{id}', 'App\Http\Controllers\ArchivosPagoController@destroy')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+    Route::get('AllInfoArchivosPagos/{id}', 'App\Http\Controllers\ArchivosPagoController@AllInfoArchivosPagos')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,CLIENTELA');
+
+    // CICLOS
+    Route::get('Ciclos', 'App\Http\Controllers\CicloController@index')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,CLIENTELA');
+    Route::post('Ciclos', 'App\Http\Controllers\CicloController@store')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+    Route::get('Ciclos/{id}', 'App\Http\Controllers\CicloController@show')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,CLIENTELA');
+    Route::put('Ciclos/{id}', 'App\Http\Controllers\CicloController@update')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+    Route::delete('Ciclos/{id}', 'App\Http\Controllers\CicloController@destroy')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+    Route::get('AllInfoCiclos/{id}', 'App\Http\Controllers\CicloController@AllInfoCiclos')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,CLIENTELA');
+
+    // CLIENTES
+    Route::get('Clientes', 'App\Http\Controllers\ClienteController@index')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,CLIENTELA');
+    Route::post('Clientes', 'App\Http\Controllers\ClienteController@store')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+    Route::get('Clientes/{id}', 'App\Http\Controllers\ClienteController@show')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,CLIENTELA');
+    Route::put('Clientes/{id}', 'App\Http\Controllers\ClienteController@update')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+    Route::delete('Clientes/{id}', 'App\Http\Controllers\ClienteController@destroy')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+
+    // INFO CLIENTES
+    Route::get('InfoClientes', 'App\Http\Controllers\InfoClienteController@index')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,CLIENTELA');
+    Route::post('InfoClientes', 'App\Http\Controllers\InfoClienteController@store')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+    Route::get('InfoClientes/{id}', 'App\Http\Controllers\InfoClienteController@show')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,CLIENTELA');
+    Route::put('InfoClientes/{id}', 'App\Http\Controllers\InfoClienteController@update')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+    Route::delete('InfoClientes/{id}', 'App\Http\Controllers\InfoClienteController@destroy')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+    Route::get('AllInfoClientes/{id}', 'App\Http\Controllers\InfoClienteController@AllInfoClientes')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,CLIENTELA');
+
+    // MATRIZ ESCALAS
+    Route::get('MatrizEscalas', 'App\Http\Controllers\MatrizEscalaController@index')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,CLIENTELA');
+    Route::post('MatrizEscalas', 'App\Http\Controllers\MatrizEscalaController@store')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+    Route::get('MatrizEscalas/{id}', 'App\Http\Controllers\MatrizEscalaController@show')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,CLIENTELA');
+    Route::put('MatrizEscalas/{id}', 'App\Http\Controllers\MatrizEscalaController@update')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+    Route::delete('MatrizEscalas/{id}', 'App\Http\Controllers\MatrizEscalaController@destroy')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+
+    // PAGOS
+    Route::get('Pagos', 'App\Http\Controllers\PagoController@index')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,CLIENTELA');
+    Route::post('Pagos', 'App\Http\Controllers\PagoController@store')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+    Route::get('Pagos/{id}', 'App\Http\Controllers\PagoController@show')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,CLIENTELA');
+    Route::put('Pagos/{id}', 'App\Http\Controllers\PagoController@update')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+    Route::delete('Pagos/{id}', 'App\Http\Controllers\PagoController@destroy')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+    Route::get('AllPagosidCliente/{id}', 'App\Http\Controllers\PagoController@AllPagosidCliente')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,CLIENTELA');
+    Route::get('AllPagosidinfoCliente/{id}', 'App\Http\Controllers\PagoController@AllPagosidinfoCliente')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,CLIENTELA');
+
+    // PLAN DE INTERVENCIONES CICLOS
+    Route::get('PlandeIntervencionsCiclos', 'App\Http\Controllers\PlandeIntervencionsCiclosController@index')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,CLIENTELA');
+    Route::post('PlandeIntervencionsCiclos', 'App\Http\Controllers\PlandeIntervencionsCiclosController@store')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+    Route::get('PlandeIntervencionsCiclos/{id}', 'App\Http\Controllers\PlandeIntervencionsCiclosController@show')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,CLIENTELA');
+    Route::put('PlandeIntervencionsCiclos/{id}', 'App\Http\Controllers\PlandeIntervencionsCiclosController@update')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+    Route::delete('PlandeIntervencionsCiclos/{id}', 'App\Http\Controllers\PlandeIntervencionsCiclosController@destroy')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+
+    // SUB MATRIZ ESCALAS
+    Route::get('SubMatrizEscalas', 'App\Http\Controllers\SubMatrizEscalaController@index')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,CLIENTELA');
+    Route::post('SubMatrizEscalas', 'App\Http\Controllers\SubMatrizEscalaController@store')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+    Route::get('SubMatrizEscalas/{id}', 'App\Http\Controllers\SubMatrizEscalaController@show')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,CLIENTELA');
+    Route::put('SubMatrizEscalas/{id}', 'App\Http\Controllers\SubMatrizEscalaController@update')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+    Route::delete('SubMatrizEscalas/{id}', 'App\Http\Controllers\SubMatrizEscalaController@destroy')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+    Route::get('AllInfoSubMatrizEscalas/{id}', 'App\Http\Controllers\SubMatrizEscalaController@AllInfoSubMatrizEscalas')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,CLIENTELA');
+
+    // PLAN DE INTERVENCIONES
+    Route::get('PlandeIntervencions', 'App\Http\Controllers\PlandeIntervencionController@index')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,CLIENTELA');
+    Route::post('PlandeIntervencions', 'App\Http\Controllers\PlandeIntervencionController@store')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+    Route::get('PlandeIntervencions/{id}', 'App\Http\Controllers\PlandeIntervencionController@show')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,CLIENTELA');
+    Route::put('PlandeIntervencions/{id}', 'App\Http\Controllers\PlandeIntervencionController@update')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+    Route::delete('PlandeIntervencions/{id}', 'App\Http\Controllers\PlandeIntervencionController@destroy')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+    Route::get('CargarPlandeIntervencionxidInfoCliente/{id}', 'App\Http\Controllers\PlandeIntervencionController@CargarPlandeIntervencionxidInfoCliente')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,CLIENTELA');
+
+    // SUB PLAN DE INTERVENCIONES
+    Route::get('SubPlandeIntervencions', 'App\Http\Controllers\SubPlandeIntervencionController@index')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,CLIENTELA');
+    Route::post('SubPlandeIntervencions', 'App\Http\Controllers\SubPlandeIntervencionController@store')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+    Route::get('SubPlandeIntervencions/{id}', 'App\Http\Controllers\SubPlandeIntervencionController@show')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,CLIENTELA');
+    Route::put('SubPlandeIntervencions/{id}', 'App\Http\Controllers\SubPlandeIntervencionController@update')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+    Route::delete('SubPlandeIntervencions/{id}', 'App\Http\Controllers\SubPlandeIntervencionController@destroy')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+    Route::get('AllInfoSubPlandeIntervencions/{id}', 'App\Http\Controllers\SubPlandeIntervencionController@AllInfoSubPlandeIntervencions')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,CLIENTELA');
+    Route::post('eliminarsubplandeintervencionsxdata','App\Http\Controllers\SubPlandeIntervencionController@eliminarsubplandeintervencionsxdata')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+
+    // USUARIOS
+    Route::get('Usuarios', 'App\Http\Controllers\UsuarioController@index')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,CLIENTELA');
+    Route::post('Usuarios', 'App\Http\Controllers\UsuarioController@store')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+    Route::get('Usuarios/{id}', 'App\Http\Controllers\UsuarioController@show')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,CLIENTELA');
+    Route::put('Usuarios/{id}', 'App\Http\Controllers\UsuarioController@update')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+    Route::delete('Usuarios/{id}', 'App\Http\Controllers\UsuarioController@destroy')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+
+    // DEMUCAS
+    Route::get('Demucas', 'App\Http\Controllers\DemucasController@index')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,CLIENTELA');
+    Route::post('Demucas', 'App\Http\Controllers\DemucasController@store')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+    Route::get('Demucas/{id}', 'App\Http\Controllers\DemucasController@show')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,CLIENTELA');
+    Route::put('Demucas/{id}', 'App\Http\Controllers\DemucasController@update')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+    Route::delete('Demucas/{id}', 'App\Http\Controllers\DemucasController@destroy')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+    Route::get('AllDemucas/{id}', 'App\Http\Controllers\DemucasController@AllDemucas')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,CLIENTELA');
+    Route::post('AddGrupoDemucas', 'App\Http\Controllers\DemucasController@AddGrupoDemucas')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+    Route::post('DeleteGrupoDemucas', 'App\Http\Controllers\DemucasController@DeleteGrupoDemucas')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
+    Route::put('ModificarEscalaDemucas/{id}', 'App\Http\Controllers\DemucasController@ModificarEscalaDemucas')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');
 });
 
-//SOLO SUPER ADMINISTRADOR
-Route::middleware(['auth:sanctum'])->group(function () {
-    Route::middleware([CheckAbilities::class . ':superadmin'])->group(function () {
-
-        //ARCHIVOS ARCHIVOSPAGOS
-        Route::resource('ArchivosPagos', 'App\Http\Controllers\ArchivosPagoController');
-        Route::get('AllInfoArchivosPagos/{id}', 'App\Http\Controllers\ArchivosPagoController@AllInfoArchivosPagos')->middleware([CheckAbilities::class . ':show-cliente']);
-        //CICLOS
-        Route::resource('Ciclos', 'App\Http\Controllers\CicloController');
-        Route::get('AllInfoCiclos/{id}', 'App\Http\Controllers\CicloController@AllInfoCiclos')->middleware([CheckAbilities::class . ':show-cliente']);
-        //INFO CLIENTES
-        Route::resource('InfoClientes', 'App\Http\Controllers\InfoClienteController');
-        Route::get('AllInfoClientes/{id}', 'App\Http\Controllers\InfoClienteController@AllInfoClientes')->middleware([CheckAbilities::class . ':aaa']);
-
-        //MATRIZ ESCALAS
-        Route::resource('MatrizEscalas', 'App\Http\Controllers\MatrizEscalaController');
-        //PAGOS
-        Route::resource('Pagos', 'App\Http\Controllers\PagoController');
-
-        Route::resource('PlandeIntervencionsCiclos', 'App\Http\Controllers\PlandeIntervencionsCiclosController');
-        //SUB MATRIZ ESCALAS
-        Route::resource('SubMatrizEscalas', 'App\Http\Controllers\SubMatrizEscalaController');
-        Route::get('AllInfoSubMatrizEscalas/{id}', 'App\Http\Controllers\SubMatrizEscalaController@AllInfoSubMatrizEscalas')->middleware([CheckAbilities::class . ':show-cliente']);
-        //PLAN DE INTERVENCIONES
-        Route::resource('PlandeIntervencions', 'App\Http\Controllers\PlandeIntervencionController');
-        Route::get('CargarPlandeIntervencionxidInfoCliente/{id}', 'App\Http\Controllers\PlandeIntervencionController@CargarPlandeIntervencionxidInfoCliente')->middleware([CheckAbilities::class . ':show-cliente']);
-
-        //SUB PLAN DE INTERVENCIONES
-        Route::resource('SubPlandeIntervencions', 'App\Http\Controllers\SubPlandeIntervencionController');
-        Route::get('AllInfoSubPlandeIntervencions/{id}', 'App\Http\Controllers\SubPlandeIntervencionController@AllInfoSubPlandeIntervencions')->middleware([CheckAbilities::class . ':show-cliente']);
-        Route::post('eliminarsubplandeintervencionsxdata','App\Http\Controllers\SubPlandeIntervencionController@eliminarsubplandeintervencionsxdata')->middleware([CheckAbilities::class . ':show-cliente']);
-
-        Route::resource('Usuarios', 'App\Http\Controllers\UsuarioController');
-        //DEMUCAS
-        Route::resource('Demucas', 'App\Http\Controllers\DemucasController');
-        Route::get('AllDemucas/{id}', 'App\Http\Controllers\DemucasController@AllDemucas')->middleware([CheckAbilities::class . ':show-cliente']);
-        Route::post('AddGrupoDemucas', 'App\Http\Controllers\DemucasController@AddGrupoDemucas')->middleware([CheckAbilities::class . ':show-cliente']);
-        Route::post('DeleteGrupoDemucas', 'App\Http\Controllers\DemucasController@DeleteGrupoDemucas')->middleware([CheckAbilities::class . ':show-cliente']);
-        Route::put('ModificarEscalaDemucas/{id}', 'App\Http\Controllers\DemucasController@ModificarEscalaDemucas')->middleware([CheckAbilities::class . ':show-cliente']);
-    });
-});
-
-//SOLO SUPER ADMINISTRADOR
-Route::middleware(['auth:sanctum'])->group(function () {
-    Route::middleware([CheckAbilities::class . ':Clientela'])->group(function () {
-
-        //ARCHIVOS ARCHIVOSPAGOS
-        Route::resource('ArchivosPagos', 'App\Http\Controllers\ArchivosPagoController');
-        Route::get('AllInfoArchivosPagos/{id}', 'App\Http\Controllers\ArchivosPagoController@AllInfoArchivosPagos');
-        //CICLOS
-        Route::resource('Ciclos', 'App\Http\Controllers\CicloController');
-        Route::get('AllInfoCiclos/{id}', 'App\Http\Controllers\CicloController@AllInfoCiclos');
-        //INFO CLIENTES
-        Route::resource('InfoClientes', 'App\Http\Controllers\InfoClienteController');
-        Route::get('AllInfoClientes/{id}', 'App\Http\Controllers\InfoClienteController@AllInfoClientes');
-
-        //MATRIZ ESCALAS
-        Route::resource('MatrizEscalas', 'App\Http\Controllers\MatrizEscalaController');
-        //PAGOS
-        Route::resource('Pagos', 'App\Http\Controllers\PagoController');
-        Route::get('AllPagosidCliente/{id}', 'App\Http\Controllers\PagoController@AllPagosidCliente');
-        Route::get('AllPagosidinfoCliente/{id}', 'App\Http\Controllers\PagoController@AllPagosidinfoCliente');
-
-        Route::resource('PlandeIntervencionsCiclos', 'App\Http\Controllers\PlandeIntervencionsCiclosController');
-        //SUB MATRIZ ESCALAS
-        Route::resource('SubMatrizEscalas', 'App\Http\Controllers\SubMatrizEscalaController');
-        Route::get('AllInfoSubMatrizEscalas/{id}', 'App\Http\Controllers\SubMatrizEscalaController@AllInfoSubMatrizEscalas');
-        //PLAN DE INTERVENCIONES
-        Route::resource('PlandeIntervencions', 'App\Http\Controllers\PlandeIntervencionController');
-        Route::get('CargarPlandeIntervencionxidInfoCliente/{id}', 'App\Http\Controllers\PlandeIntervencionController@CargarPlandeIntervencionxidInfoCliente');
-
-        //SUB PLAN DE INTERVENCIONES
-        Route::resource('SubPlandeIntervencions', 'App\Http\Controllers\SubPlandeIntervencionController');
-        Route::get('AllInfoSubPlandeIntervencions/{id}', 'App\Http\Controllers\SubPlandeIntervencionController@AllInfoSubPlandeIntervencions');
-        Route::post('eliminarsubplandeintervencionsxdata','App\Http\Controllers\SubPlandeIntervencionController@eliminarsubplandeintervencionsxdata');
-
-        Route::resource('Usuarios', 'App\Http\Controllers\UsuarioController');
-        //DEMUCAS
-        Route::resource('Demucas', 'App\Http\Controllers\DemucasController');
-        Route::get('AllDemucas/{id}', 'App\Http\Controllers\DemucasController@AllDemucas');
-        Route::post('AddGrupoDemucas', 'App\Http\Controllers\DemucasController@AddGrupoDemucas');
-        Route::post('DeleteGrupoDemucas', 'App\Http\Controllers\DemucasController@DeleteGrupoDemucas');
-        Route::put('ModificarEscalaDemucas/{id}', 'App\Http\Controllers\DemucasController@ModificarEscalaDemucas');
-    });
-});
+#endregion SUPERADMINISTRADOR
 
 
+// Route::resource('ArchivosPagos', 'App\Http\Controllers\ArchivosPagoController');
+// Route::get('AllInfoArchivosPagos/{id}', 'App\Http\Controllers\ArchivosPagoController@AllInfoArchivosPagos')->middleware([CheckAbilities::class . ':show-cliente']);
+// //CICLOS
+// Route::resource('Ciclos', 'App\Http\Controllers\CicloController');
+// Route::get('AllInfoCiclos/{id}', 'App\Http\Controllers\CicloController@AllInfoCiclos')->middleware([CheckAbilities::class . ':show-cliente']);
+// //CLIENTES
+// Route::resource('Clientes', 'App\Http\Controllers\ClienteController');
+// //INFO CLIENTES
+// Route::resource('InfoClientes', 'App\Http\Controllers\InfoClienteController');
+// Route::get('AllInfoClientes/{id}', 'App\Http\Controllers\InfoClienteController@AllInfoClientes')->middleware([CheckAbilities::class . ':aaa']);
 
+// //MATRIZ ESCALAS
+// Route::resource('MatrizEscalas', 'App\Http\Controllers\MatrizEscalaController');
+// //PAGOS
+// Route::resource('Pagos', 'App\Http\Controllers\PagoController');
+// Route::get('AllPagosidCliente/{id}', 'App\Http\Controllers\PagoController@AllPagosidCliente');
+// Route::get('AllPagosidinfoCliente/{id}', 'App\Http\Controllers\PagoController@AllPagosidinfoCliente');
 
+// Route::resource('PlandeIntervencionsCiclos', 'App\Http\Controllers\PlandeIntervencionsCiclosController');
+// //SUB MATRIZ ESCALAS
+// Route::resource('SubMatrizEscalas', 'App\Http\Controllers\SubMatrizEscalaController');
+// Route::get('AllInfoSubMatrizEscalas/{id}', 'App\Http\Controllers\SubMatrizEscalaController@AllInfoSubMatrizEscalas')->middleware([CheckAbilities::class . ':show-cliente']);
+// //PLAN DE INTERVENCIONES
+// Route::resource('PlandeIntervencions', 'App\Http\Controllers\PlandeIntervencionController');
+// Route::get('CargarPlandeIntervencionxidInfoCliente/{id}', 'App\Http\Controllers\PlandeIntervencionController@CargarPlandeIntervencionxidInfoCliente')->middleware([CheckAbilities::class . ':show-cliente']);
+
+// //SUB PLAN DE INTERVENCIONES
+// Route::resource('SubPlandeIntervencions', 'App\Http\Controllers\SubPlandeIntervencionController');
+// Route::get('AllInfoSubPlandeIntervencions/{id}', 'App\Http\Controllers\SubPlandeIntervencionController@AllInfoSubPlandeIntervencions')->middleware([CheckAbilities::class . ':show-cliente']);
+// Route::post('eliminarsubplandeintervencionsxdata','App\Http\Controllers\SubPlandeIntervencionController@eliminarsubplandeintervencionsxdata')->middleware([CheckAbilities::class . ':show-cliente']);
+
+// Route::resource('Usuarios', 'App\Http\Controllers\UsuarioController');
+// //DEMUCAS
+// Route::resource('Demucas', 'App\Http\Controllers\DemucasController');
+// Route::get('AllDemucas/{id}', 'App\Http\Controllers\DemucasController@AllDemucas')->middleware([CheckAbilities::class . ':show-cliente']);
+// Route::post('AddGrupoDemucas', 'App\Http\Controllers\DemucasController@AddGrupoDemucas')->middleware([CheckAbilities::class . ':show-cliente']);
+// Route::post('DeleteGrupoDemucas', 'App\Http\Controllers\DemucasController@DeleteGrupoDemucas')->middleware([CheckAbilities::class . ':show-cliente']);
+// Route::put('ModificarEscalaDemucas/{id}', 'App\Http\Controllers\DemucasController@ModificarEscalaDemucas')->middleware([CheckAbilities::class . ':show-cliente']);
 
 
 

@@ -73,8 +73,24 @@ class AuthController extends Controller
             // $tokenResult = $admin->createToken("Docente");
             // $tokenResult = $admin->createToken('Docente', ['*'], now()->addMinutes(60));
             $NomC = $sesion->apellidos.' '.$sesion->nombres;
-            $tokenResult = $sesion->createPersonalizedToken('Admin', ['*'], now()->addMinutes(60), ['nombrecompleto' => $NomC]);
-            $token = $tokenResult->plainTextToken;
+            $tipoAdmin = $sesion->tipo;
+
+            switch ($tipoAdmin) {
+                case 'SUPERADMINISTRADOR':
+                    $tokenResult = $sesion->createPersonalizedToken('Admin', ['SUPERADMIN'], now()->addMinutes(60), ['nombrecompleto' => $NomC]);
+                    $token = $tokenResult->plainTextToken;
+                    break;
+                case 'SECRETARIO(A)':
+                    $tokenResult = $sesion->createPersonalizedToken('Admin', ['SECRETARIO(A)'], now()->addMinutes(60), ['nombrecompleto' => $NomC]);
+                    $token = $tokenResult->plainTextToken;
+                    break;
+                default:
+                    //ES MUSICOTERAPEUTA
+                    $tokenResult = $sesion->createPersonalizedToken('Admin', ['MUSICOTERAPEUTA'], now()->addMinutes(60), ['nombrecompleto' => $NomC]);
+                    $token = $tokenResult->plainTextToken;
+                    break;
+            }
+            
 
             // responder
             return response()->json([
@@ -86,7 +102,7 @@ class AuthController extends Controller
             //INICIANDO SESION COMO CLIENTE
             // generar token
             $NomC = $sesion->apellidos.' '.$sesion->nombres;
-            $tokenResult = $sesion->createPersonalizedToken('Cliente', ['Clientela'], now()->addMinutes(60), ['nombrecompleto' => $NomC]);
+            $tokenResult = $sesion->createPersonalizedToken('Cliente', ['CLIENTELA'], now()->addMinutes(60), ['nombrecompleto' => $NomC]);
             $token = $tokenResult->plainTextToken;
             // responder
             return response()->json([

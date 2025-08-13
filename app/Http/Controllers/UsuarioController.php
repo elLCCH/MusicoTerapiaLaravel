@@ -64,5 +64,18 @@ class UsuarioController extends Controller
         Usuario::destroy($id);
         return response()->json(['data' => 'ELIMINADO EXITOSAMENTE']);
     }
+
+    //////PARA CARGAR USUARIOS PARA PUBLICO
+    public function CargarUsuariosPublico()
+    {
+        $usuarios = Usuario::select('nombres', 'apellidos', 'estado', 'celulartrabajo', 'foto', 'tipo')
+            ->orderBy('estado', 'asc')
+            ->orderBy('apellidos', 'asc')
+            ->orderBy('nombres', 'asc')
+            ->get();
+        
+        return response()->json(['data' => $usuarios]);
+    }
+
     //#endregion Fin Controller de Crud PHP de Usuario
 }
