@@ -65,10 +65,20 @@ class UsuarioController extends Controller
         return response()->json(['data' => 'ELIMINADO EXITOSAMENTE']);
     }
 
+
+    public function ModificarHojadeVida(Request $request, $id)
+    {
+
+        Usuario::where('id', $id)->update(['hojadevida' => $request->hojadevida]);
+
+        return response()->json(['message' => 'Hoja de vida actualizada correctamente']);
+    }
+
+
     //////PARA CARGAR USUARIOS PARA PUBLICO
     public function CargarUsuariosPublico()
     {
-        $usuarios = Usuario::select('nombres', 'apellidos', 'estado', 'celulartrabajo', 'foto', 'tipo')
+        $usuarios = Usuario::select('nombres', 'apellidos', 'estado', 'celulartrabajo', 'foto', 'tipo','funciones', 'hojadevida')
             ->orderBy('estado', 'asc')
             ->orderBy('apellidos', 'asc')
             ->orderBy('nombres', 'asc')

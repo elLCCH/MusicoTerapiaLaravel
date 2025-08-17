@@ -21,7 +21,8 @@ class Usuario extends Authenticatable
         'celulartrabajo',
         'carnet',
         'foto',
-        'tipo','estado'
+        'tipo','estado',
+        'funciones', 'hojadevida'
     ];
     public function createPersonalizedToken($tokenName, $abilities, $expiration, $additionalInfo = [])
     {
