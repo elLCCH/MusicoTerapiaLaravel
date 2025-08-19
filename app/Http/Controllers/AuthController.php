@@ -30,15 +30,21 @@ class AuthController extends Controller
         //INTENTANDO INICIO DE SESION COMO ADMINISTRADOR
         $sesion = Usuario::where('usuario','=', $user)->first();
         try {
-            if (Hash::check($pass, $sesion->contrasenia)) {
-                // INICIO DE SESION CORRECTO COMO ADMINISTRADOR
-                $login =true;
-                $esadmin = true; // es un administrador
-            }
-            else
+            if ($sesion->estado == 'ACTIVO') {
+                if (Hash::check($pass, $sesion->contrasenia)) {
+                    // INICIO DE SESION CORRECTO COMO ADMINISTRADOR
+                    $login =true;
+                    $esadmin = true; // es un administrador
+                }
+                else
+                {
+                    $login = false;
+                }
+            }else
             {
-               $login = false;
+                $login = false;
             }
+            
         } catch (\Throwable $th) {
             // NO LOGIN COMO ADMINISTRADOR
             $login =false;
@@ -50,15 +56,20 @@ class AuthController extends Controller
             //INTENTANDO INICIO DE SESION COMO CLIENTE
             $sesion = Cliente::where('usuario','=', $user)->first();
             try {
-                if (Hash::check($pass, $sesion->contrasenia)) {
-                    // INICIO DE SESION CORRECTO COMO CLIENTE
-                    $login =true;
-                    $esadmin = false; // es un cliente
+                if ($sesion->estado == 'ACTIVO') {
+                    if (Hash::check($pass, $sesion->contrasenia)) {
+                        // INICIO DE SESION CORRECTO COMO CLIENTE
+                        $login =true;
+                        $esadmin = false; // es un cliente
+                    }
+                    else
+                    {
+                        $login = false;
+                    }
+                }else{
+                    $login = false;
                 }
-                else
-                {
-                   $login = false;
-                }
+                
             } catch (\Throwable $th) {
                 // NO LOGIN COMO CLIENTE
                 $login =false;
@@ -82,6 +93,10 @@ class AuthController extends Controller
                     break;
                 case 'SECRETARIO(A)':
                     $tokenResult = $sesion->createPersonalizedToken('Admin', ['SECRETARIO(A)'], now()->addMinutes(60), ['nombrecompleto' => $NomC]);
+                    $token = $tokenResult->plainTextToken;
+                    break;
+                case 'ADMINLECTOR':
+                    $tokenResult = $sesion->createPersonalizedToken('Admin', ['ADMINLECTOR'], now()->addMinutes(60), ['nombrecompleto' => $NomC]);
                     $token = $tokenResult->plainTextToken;
                     break;
                 default:

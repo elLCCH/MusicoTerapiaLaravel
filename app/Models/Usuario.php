@@ -22,7 +22,7 @@ class Usuario extends Authenticatable
         'carnet',
         'foto',
         'tipo','estado',
-        'funciones', 'hojadevida'
+        'funciones', 'hojadevida','visibilidad'
     ];
     public function createPersonalizedToken($tokenName, $abilities, $expiration, $additionalInfo = [])
     {

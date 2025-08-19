@@ -78,7 +78,7 @@ class UsuarioController extends Controller
     //////PARA CARGAR USUARIOS PARA PUBLICO
     public function CargarUsuariosPublico()
     {
-        $usuarios = Usuario::select('nombres', 'apellidos', 'estado', 'celulartrabajo', 'foto', 'tipo','funciones', 'hojadevida')
+        $usuarios = Usuario::select('nombres', 'apellidos', 'estado', 'celulartrabajo', 'foto', 'tipo','funciones', 'hojadevida','visibilidad')
             ->orderBy('estado', 'asc')
             ->orderBy('apellidos', 'asc')
             ->orderBy('nombres', 'asc')
