@@ -209,6 +209,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('AddGrupoDemucas', 'App\Http\Controllers\DemucasController@AddGrupoDemucas')->middleware(CheckAbilities::class . ':SUPERADMIN');
     Route::post('DeleteGrupoDemucas', 'App\Http\Controllers\DemucasController@DeleteGrupoDemucas')->middleware(CheckAbilities::class . ':SUPERADMIN');
     Route::put('ModificarEscalaDemucas/{id}', 'App\Http\Controllers\DemucasController@ModificarEscalaDemucas')->middleware(CheckAbilities::class . ':SUPERADMIN');
+
+    //EXTRAS DE SUPERADMIN
+    Route::get('clientesActivosPagos', 'App\Http\Controllers\PagoController@clientesActivosPagos')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),ADMINLECTOR');
+
+
 });
 
 #endregion SUPERADMINISTRADOR

@@ -6,6 +6,7 @@ use App\Models\Pago;
 use Illuminate\Http\Request;
 use App\Http\Middleware\UpdateTokenExpiration;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
 
 class PagoController extends Controller
 {
@@ -107,5 +108,46 @@ class PagoController extends Controller
         ->orderBy('pagos.id', 'desc')
         ->get();
         return response()->json(['data' => $Pago]);
+    }
+    //PARA LOS PAGOS EXCEL
+    public function clientesActivosPagos()
+    {
+        $data = DB::select("
+            SELECT
+                ic.fechaadmision,
+                c.estado,
+                ci.ciclos,
+                c.apellidos  AS cliente_apellidos,
+                c.nombres    AS cliente_nombres,
+                ic.diagnostico,
+                ic.tipotratamiento,
+                ic.duracion,
+                ic.frecuencia,
+                p.horario,
+                p.tipo       AS tipo_pago,
+                p.precio,
+                p.saldo,
+                p.pagado,
+                p.descuento,
+                ap.fechapago,
+                ap.horapago,
+                ap.monto,
+                ap.estadopago
+            FROM clientes c
+            INNER JOIN infoclientes ic ON ic.id_cliente = c.id
+            INNER JOIN pagos p ON p.id_infocliente = ic.id
+            LEFT JOIN archivospagos ap ON ap.id_pago = p.id
+            LEFT JOIN (
+                SELECT
+                    id_pago,
+                    GROUP_CONCAT(DISTINCT nrociclo ORDER BY nrociclo SEPARATOR ', ') AS ciclos
+                FROM ciclos
+                GROUP BY id_pago
+            ) ci ON ci.id_pago = p.id
+            WHERE c.estado = 'ACTIVO'
+            ORDER BY c.apellidos, c.nombres, ic.fechaadmision, ci.ciclos, ap.fechapago
+        ");
+
+        return response()->json($data);
     }
 }

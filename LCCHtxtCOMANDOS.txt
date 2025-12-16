@@ -67,23 +67,36 @@ CREATE OR REPLACE TABLE clientes (
 );
 
 ----PASO 1:ENTONCES EL MODELO DE ESTE DEBERA ESTAR ASI:
+<?php
+
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Database\Eloquent\Model;
 
-class Cliente extends Authenticatable //AHORA Authenticatable
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+
+// class Cliente extends Model
+class Cliente extends Authenticatable
 {
     use HasApiTokens, HasFactory;
-
     protected $table = 'clientes';
-
     // Lista de atributos asignables
     protected $fillable = [
-        'nombres', 'apellidos', 'usuario', 'contrasenia', 'celular', 'edad', 'fechnac', 'carnet', 'foto'
+        'nombres', 'apellidos', 'usuario', 'contrasenia', 'celular', 'edad', 'fechnac', 'carnet', 'foto','estado'
     ];
+    public function createPersonalizedToken($tokenName, $abilities, $expiration, $additionalInfo = [])
+    {
+        $token = $this->createToken($tokenName, $abilities,$expiration);
+
+        // Agregar información adicional al token
+        $token->accessToken->forceFill($additionalInfo)->save();
+
+        return $token;
+    }
 }
+
 
 ----PASO 2: crear tabla
 CREATE TABLE `personal_access_tokens` (
@@ -176,7 +189,7 @@ es interesante que funcione el expires_at, cuando expira en BD entonces cuando s
 ahora como en el PASO 6 crearé interceptores entonces como detecta q esta expirado entonces elimino del localStorage el TOKEN y nos retorna a inicio,
 COMO YA SABEMOS Q FUNCIONA ESTO ENTONCES HAY Q HACER Q TENGA FECHA DE EXPIRACION: SOLO FALTARIA HACER que tenga tiempo de expiracion los token en la BD
 en donde creamos el token poner:
-PASO 5.2: PONIENDO CODIGO PARA Q TENGA EXPIRACION EL TOKEN//REEMPLAZANDO ESTE CODIGO: $tokenResult = $admin->createToken("login"); //RECUERDA Q ESTE ES UN EJEMPLO DE 15MINUTOS
+PASO 5.2 (EN EL AUTHCONTROLLER): PONIENDO CODIGO PARA Q TENGA EXPIRACION EL TOKEN//REEMPLAZANDO ESTE CODIGO: $tokenResult = $admin->createToken("login"); //RECUERDA Q ESTE ES UN EJEMPLO DE 15MINUTOS
 $tokenResult = $admin->createToken('login', ['*'], now()->addDays(7));
 O SI QUEREMOS POR MINUTOS ENTONCES
 $tokenResult = $admin->createToken('login', ['*'], now()->addMinutes(15)); //15minutos
@@ -283,7 +296,7 @@ export class AuthInterceptor implements HttpInterceptor {
           if (error instanceof HttpErrorResponse && error.status === 401) {
             console.log("TOKEN EXPIRADO");
             localStorage.removeItem("token");
-            this.router.navigate(["/inicio"]);
+            //this.router.navigate(["/inicio"]);
           }
           if (error instanceof HttpErrorResponse && error.status === 403) {
             console.log("PERMISOS INSUFICIENTES");
@@ -300,8 +313,10 @@ export class AuthInterceptor implements HttpInterceptor {
 
     adicionar en el providers:  provideHttpClient(),{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
 
+    ASI DEBERIA QUEDAR
+    
 
-    LO DEMAS DE CODIGO ES DE ESTE PROYECTO
+    LO DEMAS DE CODIGO ES DE ESTE PROYECTO (ASI QUEDA EL app.config.ts)
 //app.config.ts
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
@@ -538,16 +553,24 @@ Route::prefix("v1/auth")->group(function(){ //el prefijo vi/auth funciona como e
 });
 
 PASO 2: ELIMINAR TOKEN CONFIGURANDO EL logout del authcontroller
-use Illuminate\Support\Facades\DB;
 public function logout(Request $request)
 {
-    $token = $request->input('token');
+    // Intentar obtener el token desde input('token') o desde el header Authorization
+    $token = $request->input('token') ?: $request->bearerToken();
+
+    if (!$token) {
+        return response()->json(['message' => 'TOKEN NO PROPORCIONADO'], 400);
+    }
+
+    // Limpiar prefijo Bearer si existe y espacios
+    $token = trim(preg_replace('/^Bearer\s+/i', '', $token));
+
     $tokenParts = explode('|', $token);
     $tokenId = $tokenParts[0] ?? null;
 
     if ($tokenId) {
-        // Usar DB::delete con vinculaciones de parámetros
-        $deleted = DB::delete('DELETE FROM personal_access_tokens WHERE id = ?', [$tokenId]);
+        // Usar el query builder para eliminar de forma segura
+        $deleted = DB::table('personal_access_tokens')->where('id', $tokenId)->delete();
 
         if ($deleted) {
             return response()->json(['message' => 'Token DB ELIMINADO'], 200);

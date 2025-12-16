@@ -22,7 +22,7 @@ class UpdateTokenExpiration
                         return response()->json(['message' => 'EL TOKEN ESTA EXPIRADO'], 401);
                     }
 
-                    $personalAccessToken->expires_at = $now->addMinutes(60);
+                    $personalAccessToken->expires_at = $now->addMinutes(120);
                     $personalAccessToken->save();
                 }
             }

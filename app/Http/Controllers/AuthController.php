@@ -88,20 +88,20 @@ class AuthController extends Controller
 
             switch ($tipoAdmin) {
                 case 'SUPERADMINISTRADOR':
-                    $tokenResult = $sesion->createPersonalizedToken('Admin', ['SUPERADMIN'], now()->addMinutes(60), ['nombrecompleto' => $NomC]);
+                    $tokenResult = $sesion->createPersonalizedToken('Admin', ['SUPERADMIN'], now()->addMinutes(120), ['nombrecompleto' => $NomC]);
                     $token = $tokenResult->plainTextToken;
                     break;
                 case 'SECRETARIO(A)':
-                    $tokenResult = $sesion->createPersonalizedToken('Admin', ['SECRETARIO(A)'], now()->addMinutes(60), ['nombrecompleto' => $NomC]);
+                    $tokenResult = $sesion->createPersonalizedToken('Admin', ['SECRETARIO(A)'], now()->addMinutes(120), ['nombrecompleto' => $NomC]);
                     $token = $tokenResult->plainTextToken;
                     break;
                 case 'ADMINLECTOR':
-                    $tokenResult = $sesion->createPersonalizedToken('Admin', ['ADMINLECTOR'], now()->addMinutes(60), ['nombrecompleto' => $NomC]);
+                    $tokenResult = $sesion->createPersonalizedToken('Admin', ['ADMINLECTOR'], now()->addMinutes(120), ['nombrecompleto' => $NomC]);
                     $token = $tokenResult->plainTextToken;
                     break;
                 default:
                     //ES MUSICOTERAPEUTA
-                    $tokenResult = $sesion->createPersonalizedToken('Admin', ['MUSICOTERAPEUTA'], now()->addMinutes(60), ['nombrecompleto' => $NomC]);
+                    $tokenResult = $sesion->createPersonalizedToken('Admin', ['MUSICOTERAPEUTA'], now()->addMinutes(120), ['nombrecompleto' => $NomC]);
                     $token = $tokenResult->plainTextToken;
                     break;
             }
@@ -117,7 +117,7 @@ class AuthController extends Controller
             //INICIANDO SESION COMO CLIENTE
             // generar token
             $NomC = $sesion->apellidos.' '.$sesion->nombres;
-            $tokenResult = $sesion->createPersonalizedToken('Cliente', ['CLIENTELA'], now()->addMinutes(60), ['nombrecompleto' => $NomC]);
+            $tokenResult = $sesion->createPersonalizedToken('Cliente', ['CLIENTELA'], now()->addMinutes(120), ['nombrecompleto' => $NomC]);
             $token = $tokenResult->plainTextToken;
             // responder
             return response()->json([
