@@ -110,8 +110,19 @@ class PagoController extends Controller
         return response()->json(['data' => $Pago]);
     }
     //PARA LOS PAGOS EXCEL
-    public function clientesActivosPagos()
+    public function clientesActivosPagos(Request $request)
     {
+        $fechaA = $request->input('fechaA');
+        $fechaB = $request->input('fechaB');
+
+        $params = [];
+        $whereFechas = '';
+
+        if(!empty($fechaA) && !empty($fechaB)){
+            $whereFechas = " AND (ap.fechapago BETWEEN ? AND ?)";
+            $params = [$fechaA, $fechaB];
+        }
+
         $data = DB::select("
             SELECT
                 ic.fechaadmision,
@@ -132,7 +143,8 @@ class PagoController extends Controller
                 ap.fechapago,
                 ap.horapago,
                 ap.monto,
-                ap.estadopago
+                ap.estadopago,
+                ap.observacion
             FROM clientes c
             INNER JOIN infoclientes ic ON ic.id_cliente = c.id
             INNER JOIN pagos p ON p.id_infocliente = ic.id
@@ -145,8 +157,10 @@ class PagoController extends Controller
                 GROUP BY id_pago
             ) ci ON ci.id_pago = p.id
             WHERE c.estado = 'ACTIVO'
+            $whereFechas
             ORDER BY c.apellidos, c.nombres, ic.fechaadmision, ci.ciclos, ap.fechapago
-        ");
+        ", $params);
+
 
         return response()->json($data);
     }
