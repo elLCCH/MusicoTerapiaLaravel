@@ -88,6 +88,7 @@ Route::post('/deleteFile', [FileUploadController::class, 'deleteFile']);
 
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\InicioController;
+use App\Http\Controllers\DatabaseQueryController;
 
 // Route::middleware(['auth:sanctum'])->group(function () {
 //     Route::get('/Clientes', [ClienteController::class, 'index'])->middleware([CheckAbilities::class . ':MUSICOTERAPEUTA']);
@@ -100,7 +101,7 @@ use App\Http\Controllers\InicioController;
 #region RUTAS PUBLICAS 
 //INICIOS CONTROLLER (PUBLICO)
 Route::get('/Inicios', [InicioController::class, 'index']);
-
+Route::get('/Inicios/{id}', [InicioController::class, 'show']);
 //USUARIOS CONTROLLER (PUBLICO)
 Route::get('CargarUsuariosPublico', 'App\Http\Controllers\UsuarioController@CargarUsuariosPublico');
 #endregion RUTAS PUBLICAS
@@ -108,7 +109,7 @@ Route::get('CargarUsuariosPublico', 'App\Http\Controllers\UsuarioController@Carg
 #region SUPERADMINISTRADOR 
 Route::middleware(['auth:sanctum'])->group(function () {
     //INICIOS
-    Route::get('/Inicios/{id}', [InicioController::class, 'show'])->middleware([CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)']);
+    
     Route::post('/Inicios', [InicioController::class, 'store'])->middleware([CheckAbilities::class . ':SUPERADMIN']);
     Route::put('/Inicios/{id}', [InicioController::class, 'update'])->middleware([CheckAbilities::class . ':SUPERADMIN']);
     Route::delete('/Inicios/{id}', [InicioController::class, 'destroy'])->middleware([CheckAbilities::class . ':SUPERADMIN']);
@@ -177,10 +178,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // PLAN DE INTERVENCIONES
     Route::get('PlandeIntervencions', 'App\Http\Controllers\PlandeIntervencionController@index')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,ADMINLECTOR,CLIENTELA');
-    Route::post('PlandeIntervencions', 'App\Http\Controllers\PlandeIntervencionController@store')->middleware(CheckAbilities::class . ':SUPERADMIN');
+    Route::post('PlandeIntervencions', 'App\Http\Controllers\PlandeIntervencionController@store')->middleware(CheckAbilities::class . ':SUPERADMIN,MUSICOTERAPEUTA');
     Route::get('PlandeIntervencions/{id}', 'App\Http\Controllers\PlandeIntervencionController@show')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,ADMINLECTOR,CLIENTELA');
-    Route::put('PlandeIntervencions/{id}', 'App\Http\Controllers\PlandeIntervencionController@update')->middleware(CheckAbilities::class . ':SUPERADMIN');
-    Route::delete('PlandeIntervencions/{id}', 'App\Http\Controllers\PlandeIntervencionController@destroy')->middleware(CheckAbilities::class . ':SUPERADMIN');
+    Route::put('PlandeIntervencions/{id}', 'App\Http\Controllers\PlandeIntervencionController@update')->middleware(CheckAbilities::class . ':SUPERADMIN,MUSICOTERAPEUTA');
+    Route::delete('PlandeIntervencions/{id}', 'App\Http\Controllers\PlandeIntervencionController@destroy')->middleware(CheckAbilities::class . ':SUPERADMIN,MUSICOTERAPEUTA');
     Route::get('CargarPlandeIntervencionxidInfoCliente/{id}', 'App\Http\Controllers\PlandeIntervencionController@CargarPlandeIntervencionxidInfoCliente')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,ADMINLECTOR,CLIENTELA');
 
     // SUB PLAN DE INTERVENCIONES
@@ -201,17 +202,20 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('Usuarios/ModificarHojadeVida/{id}', 'App\Http\Controllers\UsuarioController@ModificarHojadeVida')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA');
     // DEMUCAS
     Route::get('Demucas', 'App\Http\Controllers\DemucasController@index')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,ADMINLECTOR,CLIENTELA');
-    Route::post('Demucas', 'App\Http\Controllers\DemucasController@store')->middleware(CheckAbilities::class . ':SUPERADMIN');
+    Route::post('Demucas', 'App\Http\Controllers\DemucasController@store')->middleware(CheckAbilities::class . ':SUPERADMIN,MUSICOTERAPEUTA');
     Route::get('Demucas/{id}', 'App\Http\Controllers\DemucasController@show')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,ADMINLECTOR,CLIENTELA');
-    Route::put('Demucas/{id}', 'App\Http\Controllers\DemucasController@update')->middleware(CheckAbilities::class . ':SUPERADMIN');
-    Route::delete('Demucas/{id}', 'App\Http\Controllers\DemucasController@destroy')->middleware(CheckAbilities::class . ':SUPERADMIN');
+    Route::put('Demucas/{id}', 'App\Http\Controllers\DemucasController@update')->middleware(CheckAbilities::class . ':SUPERADMIN,MUSICOTERAPEUTA');
+    Route::delete('Demucas/{id}', 'App\Http\Controllers\DemucasController@destroy')->middleware(CheckAbilities::class . ':SUPERADMIN,MUSICOTERAPEUTA');
     Route::get('AllDemucas/{id}', 'App\Http\Controllers\DemucasController@AllDemucas')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),MUSICOTERAPEUTA,ADMINLECTOR,CLIENTELA');
-    Route::post('AddGrupoDemucas', 'App\Http\Controllers\DemucasController@AddGrupoDemucas')->middleware(CheckAbilities::class . ':SUPERADMIN');
-    Route::post('DeleteGrupoDemucas', 'App\Http\Controllers\DemucasController@DeleteGrupoDemucas')->middleware(CheckAbilities::class . ':SUPERADMIN');
-    Route::put('ModificarEscalaDemucas/{id}', 'App\Http\Controllers\DemucasController@ModificarEscalaDemucas')->middleware(CheckAbilities::class . ':SUPERADMIN');
+    Route::post('AddGrupoDemucas', 'App\Http\Controllers\DemucasController@AddGrupoDemucas')->middleware(CheckAbilities::class . ':SUPERADMIN,MUSICOTERAPEUTA');
+    Route::post('DeleteGrupoDemucas', 'App\Http\Controllers\DemucasController@DeleteGrupoDemucas')->middleware(CheckAbilities::class . ':SUPERADMIN,MUSICOTERAPEUTA');
+    Route::put('ModificarEscalaDemucas/{id}', 'App\Http\Controllers\DemucasController@ModificarEscalaDemucas')->middleware(CheckAbilities::class . ':SUPERADMIN,MUSICOTERAPEUTA');
 
     //EXTRAS DE SUPERADMIN
     Route::get('clientesActivosPagos', 'App\Http\Controllers\PagoController@clientesActivosPagos')->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A),ADMINLECTOR');
+
+    // CONSULTADOR BD (solo lectura)
+    Route::post('admin/sql/select', [DatabaseQueryController::class, 'select'])->middleware(CheckAbilities::class . ':SUPERADMIN,SECRETARIO(A)');    
 
 
 });

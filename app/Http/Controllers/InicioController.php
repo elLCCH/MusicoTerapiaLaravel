@@ -9,8 +9,13 @@ use Illuminate\Routing\Controller;
 
 class InicioController extends Controller
 {
-    public function __construct() {
-        $this->middleware(UpdateTokenExpiration::class);
+    public function __construct()
+    {
+        $this->middleware(['auth:sanctum', UpdateTokenExpiration::class])->only([
+            'store',
+            'update',
+            'destroy',
+        ]);
     }
     //#region Inicio Controller de Crud PHP de Inicio
     public function index()

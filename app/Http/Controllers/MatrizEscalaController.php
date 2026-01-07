@@ -9,8 +9,9 @@ use Illuminate\Routing\Controller;
 
 class MatrizEscalaController extends Controller
 {
-    public function __construct() {
-        $this->middleware(UpdateTokenExpiration::class);
+    public function __construct()
+    {
+        $this->middleware(['auth:sanctum', UpdateTokenExpiration::class]);
     }
     //controllerPHPlcch MatrizEscala, $
     //#region Inicio Controller de Crud PHP de MatrizEscala

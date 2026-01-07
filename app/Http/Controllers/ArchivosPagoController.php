@@ -9,8 +9,9 @@ use Illuminate\Routing\Controller;
 
 class ArchivosPagoController extends Controller
 {
-    public function __construct() {
-        $this->middleware(UpdateTokenExpiration::class);
+    public function __construct()
+    {
+        $this->middleware(['auth:sanctum', UpdateTokenExpiration::class]);
     }
     //#region Inicio Controller de Crud PHP de ArchivosPago
     public function index()

@@ -11,8 +11,9 @@ use Illuminate\Routing\Controller;
 class DemucasController extends Controller
 {
     //controllerPHPlcch Demucas, $
-    public function __construct() {
-        $this->middleware(UpdateTokenExpiration::class);
+    public function __construct()
+    {
+        $this->middleware(['auth:sanctum', UpdateTokenExpiration::class]);
     }
     //#region Inicio Controller de Crud PHP de Demucas
     public function index()
